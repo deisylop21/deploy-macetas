@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import PublicRouter from "./routers/PublicRouter";
 import PrivateRouter from "./routers/PrivateRouter";
 import { ROUTES } from "./path";
@@ -17,6 +17,7 @@ import RolePage from "../../roles/pages/RolePage.tsx";
 export default function MainRouter() {
     return (
         <Routes>
+            <Route path="/" element={<Navigate to={ROUTES.LOGIN} replace />} />
             <Route element={<PublicRouter />}>
                 <Route path={ROUTES.LOGIN} element={<LoginPage />} />
                 <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />

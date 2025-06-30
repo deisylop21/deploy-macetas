@@ -18,7 +18,7 @@ export function PlantCard({ plant, onViewDetail, onEdit, onDelete, isDark = fals
         }`}>
             <div className="relative h-48 w-full overflow-hidden">
                 <img
-                    src={`${plant.image.image_url}?t=${Date.now()}`}
+                    src={`${plant.image?.image_url}?t=${Date.now()}`}
                     alt={plant.name}
                     className="w-full h-full object-cover"
                 />

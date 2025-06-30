@@ -17,4 +17,7 @@ export const API_ENDPOINTS = {
     PLANT_IMAGES_UPLOAD: "https://jardindeploy.onrender.com/plant-images/upload",
     PLANT_IMAGES_LINK: "https://jardindeploy.onrender.com/plant-images/link",
     PLANT_IMAGES_BY_ID: (id: string) => `https://jardindeploy.onrender.com/plant-images/${id}`,
+    ADMIN_DEVICES: "https://jardindeploy.onrender.com/admin/devices",
+    ADMIN_DEVICE_BY_ID: (id: string) => `https://jardindeploy.onrender.com/admin/devices/${id}`,
+    ADMIN_DEVICE_REGENERATE_KEY: (id: string) => `https://jardindeploy.onrender.com/admin/devices/${id}/regenerate-key`,
 };

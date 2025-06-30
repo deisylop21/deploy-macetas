@@ -13,6 +13,7 @@ import PlantSpeciesPage from "../../plants/pages/plant-species/PlantSpeciesPage.
 import UserAdminPage from "../../users/pages/UserPage.tsx";
 import ModulePage from "../../module/pages/ModulePage.tsx";
 import RolePage from "../../roles/pages/RolePage.tsx";
+import DevicesPage from "../../devices/pages/DevicesPage.tsx";
 
 export default function MainRouter() {
     return (
@@ -32,6 +33,7 @@ export default function MainRouter() {
                 <Route path={ROUTES.USERS_ADMIN} element={<UserAdminPage />} />
                 <Route path={ROUTES.MODULES} element={<ModulePage />} />
                 <Route path={ROUTES.USER_ROLE} element={<RolePage />} />
+                <Route path={ROUTES.DEVICES} element={<DevicesPage />} />
             </Route>
         </Routes>
     );

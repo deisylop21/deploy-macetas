@@ -9,5 +9,6 @@ export const ROUTES = {
         PLANT_SPECIES: "/plants/species",
         USERS_ADMIN: "/users/admin",
         MODULES: "/modules",
-        USER_ROLE: "/roles"
+        USER_ROLE: "/roles",
+        DEVICES: "/devices"
 };

@@ -54,6 +54,7 @@ export function DataTable<TData, TValue>({
     return (
         <div>
             {/* Barra de búsqueda en la primera columna */}
+            {/*
             <div className="flex items-center py-4">
                 <Input
                     placeholder={`Buscar...`}
@@ -64,6 +65,7 @@ export function DataTable<TData, TValue>({
                     className="max-w-sm"
                 />
             </div>
+            */}
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>

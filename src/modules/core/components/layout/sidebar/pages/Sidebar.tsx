@@ -7,6 +7,7 @@ import SidebarToggle from "../components/SidebarToggle.tsx";
 import SidebarItem from "../components/SidebarItem.tsx";
 import SidebarSubItem from "../components/SidebarSubItem.tsx";
 import ProfileDropdown from "../components/ProfileDropdown.tsx";
+import { ReactComponent as DevicesIcon } from "../../../../../../assets/icons/DevicesIcon.svg";
 
 import { MenuItem, SidebarProps } from "../lib/types.ts";
 
@@ -85,6 +86,12 @@ const Sidebar = ({ user }: SidebarProps) => {
             id: "stats",
             icon: <StatsIcon className="w-6 h-6" />,
             label: "Estadísticas",
+        },
+        {
+            id: "devices",
+            icon: <DevicesIcon className="w-6 h-6" />,
+            label: "Dispositivos",
+            route: "/devices"
         },
         {
             id: "users",

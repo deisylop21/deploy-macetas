@@ -46,22 +46,13 @@ export default function PlantCatalogPage() {
         uploadImages,
         handleSearch,
         handlePageChange,
-        handleTypeChange,
+
         handleSortByChange,
         handleSortOrderChange,
         resetUploadedImages
     } = usePlantCatalog();
+    {/*Hola*/}
 
-    const plantTypes = [
-        "Todas las categorías",
-        "Ornamental",
-        "Hortalizas y leguminosas",
-        "Árboles frutales",
-        "Hierbas aromáticas",
-        "Suculentas",
-        "Acuáticas",
-        "Trepadoras"
-    ];
 
     const handleAddPlant = () => {
         resetUploadedImages();
@@ -115,11 +106,10 @@ export default function PlantCatalogPage() {
                 <div className="flex items-center justify-between gap-4 px-8 mb-6">
                     <PlantCatalogFilters
                         onSearch={handleSearch}
-                        onTypeChange={handleTypeChange}
+
                         onSortByChange={handleSortByChange}
                         onSortOrderChange={handleSortOrderChange}
-                        selectedType={filters.planttype || "Todas las categorías"}
-                        plantTypes={plantTypes}sortBy={filters.sortBy || "name"}           //aqui
+                        sortBy={filters.sortBy || "name"}           //aqui
                         sortOrder={filters.sortOrder || "asc"}
                         isDark={isDark}
                     />

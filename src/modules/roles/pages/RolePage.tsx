@@ -9,12 +9,26 @@ import { RoleCreateModal } from "../components/RoleCreateModal";
 import { useRoles } from "../hooks/useRoles";
 import { CreateRoleDTO } from "../lib/types";
 import { useThemeStore } from "../../core/states/themeStore";
+import { RolesFilters } from "../components/RolesFilters";
+import { Pagination } from "../components/Pagination";
 
 const scrollbarHideClass = "scrollbar-none";
 
 export default function RolePage() {
     const [modalOpen, setModalOpen] = useState(false);
-    const { roles, modules, isLoading, error, createRole, creating } = useRoles();
+    const {
+        roles,
+        modules,
+        isLoading,
+        error,
+        createRole,
+        creating,
+        filters,
+        totalPages,
+        handleSearch,
+        handleSortChange,
+        handlePageChange
+    } = useRoles();
     const { mode } = useThemeStore();
     const isDark = mode === 'dark';
 
@@ -49,15 +63,24 @@ export default function RolePage() {
                             Gestión de Roles
                         </h1>
                     </div>
-                    <div className="flex justify-end px-8 mb-6 flex-shrink-0">
-                        <Button
-                            variant={isDark ? "outline" : "default"}
-                            onClick={() => setModalOpen(true)}
-                            disabled={creating}
-                            className={isDark ? "bg-green-600 hover:bg-green-700 text-white" : ""}
-                        >
-                            {creating ? "Creando..." : "Crear Rol"}
-                        </Button>
+                    <div className="px-8 flex-shrink-0">
+                        <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
+                            <RolesFilters
+                                onSearch={handleSearch}
+                                onSortChange={handleSortChange}
+                                sortBy={filters?.sortBy || "name"}
+                                sortOrder={filters?.sortOrder || "asc"}
+                                isDark={isDark}
+                            />
+                            <Button
+                                variant={isDark ? "outline" : "default"}
+                                onClick={() => setModalOpen(true)}
+                                disabled={creating}
+                                className={isDark ? "bg-green-600 hover:bg-green-700 text-white" : ""}
+                            >
+                                {creating ? "Creando..." : "Crear Rol"}
+                            </Button>
+                        </div>
                     </div>
                     <div className="px-8 flex-1 overflow-hidden">
                         {isLoading ? (
@@ -74,6 +97,12 @@ export default function RolePage() {
                                     columns={columns}
                                     data={roles}
                                     className={isDark ? 'text-white bg-gray-800 border-gray-700' : ''}
+                                />
+                                <Pagination
+                                    currentPage={filters.page}
+                                    totalPages={totalPages}
+                                    onPageChange={handlePageChange}
+                                    isDark={isDark}
                                 />
                             </div>
                         )}

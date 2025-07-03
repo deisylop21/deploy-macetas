@@ -9,18 +9,32 @@ import { UserCreateModal } from "../components/UserCreateModal";
 import { useUsers } from "../hooks/useUsers";
 import { CreateUserDTO } from "../lib/types";
 import { useThemeStore } from "../../core/states/themeStore";
+import { UserFilters } from "../components/UserFilters";
+import { Pagination } from "../components/Pagination";
 
 const scrollbarHideClass = "scrollbar-none";
 
 export default function UserPage() {
     const [modalOpen, setModalOpen] = useState(false);
-    const { users, roles, isLoading, error, createUser, creating } = useUsers();
+    const {
+        users,
+        roles,
+        isLoading,
+        error,
+        createUser,
+        creating,
+        filters,
+        totalPages,
+        handleSearch,
+        handleSortChange,
+        handlePageChange
+    } = useUsers();
     const { mode } = useThemeStore();
     const isDark = mode === 'dark';
 
     const columns = createUserColumns(isDark);
 
-    const activeRoles = roles.filter(role => role.is_active === true);
+    const activeRoles = roles.filter(role => role.is_active);
 
     const handleUserCreated = async (userData: CreateUserDTO) => {
         try {
@@ -51,15 +65,24 @@ export default function UserPage() {
                             Gestión de Usuarios
                         </h1>
                     </div>
-                    <div className="flex justify-end px-8 mb-6 flex-shrink-0">
-                        <Button
-                            variant={isDark ? "outline" : "default"}
-                            onClick={() => setModalOpen(true)}
-                            disabled={creating}
-                            className={isDark ? "bg-green-600 hover:bg-green-700 text-white" : ""}
-                        >
-                            {creating ? "Creando..." : "Crear Usuario"}
-                        </Button>
+                    <div className="px-8 flex-shrink-0">
+                        <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
+                            <UserFilters
+                                onSearch={handleSearch}
+                                onSortChange={handleSortChange}
+                                sortBy={filters?.sortBy || "name"}
+                                sortOrder={filters?.sortOrder || "asc"}
+                                isDark={isDark}
+                            />
+                            <Button
+                                variant={isDark ? "outline" : "default"}
+                                onClick={() => setModalOpen(true)}
+                                disabled={creating}
+                                className={isDark ? "bg-green-600 hover:bg-green-700 text-white" : ""}
+                            >
+                                {creating ? "Creando..." : "Crear Usuario"}
+                            </Button>
+                        </div>
                     </div>
                     <div className="px-8 flex-1 overflow-hidden">
                         {isLoading ? (
@@ -76,6 +99,12 @@ export default function UserPage() {
                                     columns={columns}
                                     data={users}
                                     className={isDark ? 'text-white bg-gray-800 border-gray-700' : ''}
+                                />
+                                <Pagination
+                                    currentPage={filters.page}
+                                    totalPages={totalPages}
+                                    onPageChange={handlePageChange}
+                                    isDark={isDark}
                                 />
                             </div>
                         )}

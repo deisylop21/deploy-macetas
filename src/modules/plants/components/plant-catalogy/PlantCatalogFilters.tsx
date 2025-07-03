@@ -1,16 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "../../../core/components/ui/button";
 import { Input } from "../../../core/components/ui/input";
 
 interface PlantCatalogFiltersProps {
     onSearch: (search: string) => void;
-    onTypeChange: (type: string) => void;
     onSortByChange: (sortBy: string) => void;
     onSortOrderChange: (sortOrder: "asc" | "desc") => void;
-    selectedType: string;
-    plantTypes: string[];
     sortBy: string;
     sortOrder: "asc" | "desc";
     isDark?: boolean;
@@ -18,11 +14,8 @@ interface PlantCatalogFiltersProps {
 
 export function PlantCatalogFilters({
                                         onSearch,
-                                        onTypeChange,
                                         onSortByChange,
                                         onSortOrderChange,
-                                        selectedType,
-                                        plantTypes,
                                         sortBy,
                                         sortOrder,
                                         isDark = false
@@ -38,13 +31,10 @@ export function PlantCatalogFilters({
         onSearch(searchTerm);
     };
 
-    const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        onTypeChange(e.target.value);
-    };
-
     const handleSortByChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         onSortByChange(e.target.value);
     };
+
     const handleSortOrderClick = () => {
         onSortOrderChange(sortOrder === "asc" ? "desc" : "asc");
     };
@@ -74,31 +64,6 @@ export function PlantCatalogFilters({
                         </svg>
                     </button>
                 </form>
-            </div>
-
-            <div className="relative">
-                <select
-                    value={selectedType}
-                    onChange={handleFilterChange}
-                    className={`appearance-none h-9 px-3 py-1 pr-8 rounded-md border text-base shadow-xs transition-colors outline-none focus:ring-2 focus:ring-green-500 ${
-                        isDark
-                            ? 'bg-gray-700 border-gray-600 text-white'
-                            : 'bg-white border-gray-300 text-gray-700'
-                    }`}
-                >
-                    {plantTypes.map((type, index) => (
-                        <option key={index} value={type}>
-                            {type}
-                        </option>
-                    ))}
-                </select>
-                <div className={`absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none ${
-                    isDark ? 'text-gray-400' : 'text-gray-500'
-                }`}>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                </div>
             </div>
 
             <div className="flex items-center gap-2">

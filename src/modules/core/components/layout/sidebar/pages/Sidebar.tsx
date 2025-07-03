@@ -1,16 +1,12 @@
 import { useLocation } from "react-router-dom";
-
 import { useSidebarState } from "../hooks/useSidebarState.tsx";
 import { useThemeStore } from "../../../../states/themeStore";
 import { useAuthStore } from "../../../../states/authStore";
-import SidebarToggle from "../components/SidebarToggle.tsx";
 import SidebarItem from "../components/SidebarItem.tsx";
 import SidebarSubItem from "../components/SidebarSubItem.tsx";
-import ProfileDropdown from "../components/ProfileDropdown.tsx";
-import { ReactComponent as DevicesIcon } from "../../../../../../assets/icons/DevicesIcon.svg";
-
 import { MenuItem, SidebarProps } from "../lib/types.ts";
 
+// ICON IMPORTS (mantén los tuyos aquí)
 import { ReactComponent as StatsIcon } from "../../../../../../assets/icons/StatsIcon.svg";
 import { ReactComponent as PlantIcon } from "../../../../../../assets/icons/PlantIcon.svg";
 import { ReactComponent as FaqIcon } from "../../../../../../assets/icons/FaqIcon.svg";
@@ -27,26 +23,21 @@ import { ReactComponent as CatalogyPlantsIcon } from "../../../../../../assets/i
 import { ReactComponent as FamilyPlantsIcon } from "../../../../../../assets/icons/FamilyPlantsIcon.svg";
 import { ReactComponent as GenusPlantsIcon } from "../../../../../../assets/icons/GenusPlantsIcon.svg";
 import { ReactComponent as SpeciesPlantsIcon } from "../../../../../../assets/icons/SpeciesPlantsIcon.svg";
+import { ReactComponent as DevicesIcon } from "../../../../../../assets/icons/DevicesIcon.svg";
 
-const SIDEBAR_WIDTH_OPEN = "w-64";
-const SIDEBAR_WIDTH_CLOSED = "w-16";
+const SIDEBAR_WIDTH = "w-64";
+const NAVBAR_HEIGHT = "h-16"; // 64px = 4rem
 
 const scrollbarHideClass = "scrollbar-none";
 
 const Sidebar = ({ user }: SidebarProps) => {
-    const { open, getSubmenuState, toggleSidebar, toggleSubmenu } = useSidebarState();
+    // <-- AHORA sí incluye toggleSidebar aquí -->
+    const { open, getSubmenuState, toggleSubmenu, toggleSidebar } = useSidebarState();
     const location = useLocation();
     const pathname = location.pathname;
-
     const { mode } = useThemeStore();
     const isDark = mode === 'dark';
-
     const { user: authUser, userType } = useAuthStore();
-
-    const currentUser = {
-        name: user?.name || authUser?.name || "Usuario",
-        avatarUrl: user?.avatarUrl || authUser?.picture || "https://static.vecteezy.com/system/resources/previews/005/129/844/non_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg",
-    };
 
     const userTypeFromStore = userType || "user";
 
@@ -105,7 +96,7 @@ const Sidebar = ({ user }: SidebarProps) => {
                             id: "user-admin",
                             label: "Administrador",
                             icon: <UserAdminIcon className="w-5 h-5" />,
-                            route: "/users/admin",
+                            route: "/admin-management/users",
                         },
                     ]
                     : []),
@@ -151,25 +142,28 @@ const Sidebar = ({ user }: SidebarProps) => {
 
     return (
         <>
-            <style jsx>{`
-                .scrollbar-none::-webkit-scrollbar {
-                    display: none;
-                }
-                .scrollbar-none {
-                    -ms-overflow-style: none;
-                    scrollbar-width: none;
-                }
-            `}</style>
-
+            {/* Overlay solo debajo del navbar */}
+            {open && (
+                <div
+                    className="fixed left-0 top-16 w-full h-[calc(100vh-4rem)] z-40 bg-black bg-opacity-30 md:hidden"
+                    onClick={toggleSidebar}
+                    aria-label="Cerrar menú lateral"
+                />
+            )}
             <nav
-                className={`flex flex-col h-screen 
-                    ${open ? SIDEBAR_WIDTH_OPEN : SIDEBAR_WIDTH_CLOSED}
-                    ${isDark ? 'bg-green-800' : 'bg-green-600'} 
-                    transition-all duration-300`
-                }
+                className={`
+                    fixed z-50 left-0 top-16
+                    ${SIDEBAR_WIDTH}
+                    h-[calc(100vh-4rem)]
+                    transform transition-transform duration-300
+                    ${open ? "translate-x-0" : "-translate-x-full"}
+                    ${isDark ? 'bg-green-800' : 'bg-green-600'}
+                    shadow-lg
+                    flex flex-col
+                `}
+                style={{ transitionProperty: "transform" }}
             >
-                <SidebarToggle onClick={toggleSidebar} isOpen={open} />
-
+                {/* Hamburguesa removida */}
                 <div className={`flex-1 overflow-y-auto ${scrollbarHideClass}`}>
                     <ul className="flex flex-col gap-2 mt-2 pb-4">
                         {menuItems.map((item) => {
@@ -207,10 +201,6 @@ const Sidebar = ({ user }: SidebarProps) => {
                             );
                         })}
                     </ul>
-                </div>
-
-                <div className={`flex flex-col p-3 border-t ${isDark ? 'border-green-700/60' : 'border-green-500/40'}`}>
-                    <ProfileDropdown user={currentUser} isOpen={open} />
                 </div>
             </nav>
         </>

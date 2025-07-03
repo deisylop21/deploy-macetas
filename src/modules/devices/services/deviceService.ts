@@ -1,25 +1,31 @@
-import { Device, CreateDeviceDTO, CreateDeviceResponse, UpdateDeviceDTO, GetDevicesResponse, GetDeviceResponse, RegenerateKeyResponse } from "../lib/types";
+import { Device, CreateDeviceDTO, CreateDeviceResponse, UpdateDeviceDTO, GetDevicesResponse,UpdateDeviceResponse, GetDeviceResponse, RegenerateKeyResponse } from "../lib/types";
 import { API_ENDPOINTS } from "../../core/lib/enpoints";
 import { getHeaders } from "../../core/utils/UtilsFuntions";
-
+import { DeviceFilters, DeviceResponse } from "../lib/types";
+{/*Adios*/}
 export const deviceService = {
-    getAllDevices: async (): Promise<Device[]> => {
-        try {
-            const response = await fetch(API_ENDPOINTS.ADMIN_DEVICES, {
-                headers: getHeaders()
-            });
+    getAllDevices: async (filters: DeviceFilters): Promise<DeviceResponse> => {
+        const { page, search, sortBy, sortOrder } = filters;
+        const params = [
+            `page=${page}`,
+            search ? `search=${encodeURIComponent(search)}` : "",
+            sortBy ? `sortBy=${sortBy}` : "",
+            sortOrder ? `sortOrder=${sortOrder}` : ""
+        ].filter(Boolean).join("&");
 
-            if (!response.ok) {
-                throw new Error("Error al obtener los dispositivos");
-            }
+        const url = `${API_ENDPOINTS.ADMIN_DEVICES}?${params}`;
 
-            const json: GetDevicesResponse = await response.json();
-            return json.data || [];
-        } catch (error) {
-            console.error("Error en getAllDevices:", error);
-            throw error;
+        const response = await fetch(url, {
+            headers: getHeaders()
+        });
+
+        if (!response.ok) {
+            throw new Error("Error al obtener los dispositivos");
         }
+
+        return await response.json();
     },
+
 
     getDeviceById: async (deviceId: string): Promise<Device> => {
         try {
@@ -59,21 +65,19 @@ export const deviceService = {
         }
     },
 
-    updateDevice: async (deviceId: string, deviceData: UpdateDeviceDTO): Promise<Device> => {
+    updateDevice: async (deviceId: string, deviceData: UpdateDeviceDTO): Promise<UpdateDeviceResponse> => {
         try {
             const response = await fetch(API_ENDPOINTS.ADMIN_DEVICE_BY_ID(deviceId), {
                 method: "PUT",
                 headers: getHeaders(),
                 body: JSON.stringify(deviceData),
             });
-
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || "Error al actualizar el dispositivo");
             }
-
-            const json: GetDeviceResponse = await response.json();
-            return json.device;
+            const json: UpdateDeviceResponse = await response.json();
+            return json;
         } catch (error) {
             console.error("Error en updateDevice:", error);
             throw error;

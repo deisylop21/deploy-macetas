@@ -54,23 +54,6 @@ export const createDeviceColumns = (
         }
     },
     {
-        accessorKey: "registered_at",
-        header: "Fecha de Registro",
-        cell: ({ getValue }) => {
-            const value = getValue() as string;
-            const date = new Date(value);
-            return (
-                <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-                    {date.toLocaleDateString('es-ES', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric'
-                    })}
-                </span>
-            );
-        }
-    },
-    {
         id: "actions",
         header: "Acciones",
         cell: ({ row }) => {

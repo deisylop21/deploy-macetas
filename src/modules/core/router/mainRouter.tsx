@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import PublicRouter from "./routers/PublicRouter";
 import PrivateRouter from "./routers/PrivateRouter";
+import MainLayout from "../components/layout/MainLayout";
 import { ROUTES } from "./path";
 import LoginPage from "../../auth/pages/LoginPage";
 import ForgotPasswordPage from "../../auth/pages/ForgotPasswordPage";
@@ -25,15 +26,17 @@ export default function MainRouter() {
                 <Route path={ROUTES.RESET_PASSWORD} element={<ResetPasswordPage />} />
             </Route>
             <Route element={<PrivateRouter />}>
-                <Route path={ROUTES.PROFILE} element={<Profile />} />
-                <Route path={ROUTES.CATALOG_PLANTS} element={<PlantCatalogPage />} />
-                <Route path={ROUTES.PLANT_FAMILY} element={<PlantFamilyPage />} />
-                <Route path={ROUTES.PLANT_GENUS} element={<PlantGenusPage />} />
-                <Route path={ROUTES.PLANT_SPECIES} element={<PlantSpeciesPage />} />
-                <Route path={ROUTES.USERS_ADMIN} element={<UserAdminPage />} />
-                <Route path={ROUTES.MODULES} element={<ModulePage />} />
-                <Route path={ROUTES.USER_ROLE} element={<RolePage />} />
-                <Route path={ROUTES.DEVICES} element={<DevicesPage />} />
+                <Route element={<MainLayout />}>
+                    <Route path={ROUTES.PROFILE} element={<Profile />} />
+                    <Route path={ROUTES.CATALOG_PLANTS} element={<PlantCatalogPage />} />
+                    <Route path={ROUTES.PLANT_FAMILY} element={<PlantFamilyPage />} />
+                    <Route path={ROUTES.PLANT_GENUS} element={<PlantGenusPage />} />
+                    <Route path={ROUTES.PLANT_SPECIES} element={<PlantSpeciesPage />} />
+                    <Route path={ROUTES.USERS_ADMIN} element={<UserAdminPage />} />
+                    <Route path={ROUTES.MODULES} element={<ModulePage />} />
+                    <Route path={ROUTES.USER_ROLE} element={<RolePage />} />
+                    <Route path={ROUTES.DEVICES} element={<DevicesPage />} />
+                </Route>
             </Route>
         </Routes>
     );

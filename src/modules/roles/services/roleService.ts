@@ -2,22 +2,24 @@ import { Role, CreateRoleDTO } from "../lib/types";
 import { Module } from "../../module/lib/types";
 import { API_ENDPOINTS } from "../../core/lib/enpoints";
 import { getHeaders } from "../../core/utils/UtilsFuntions";
+import { RoleFilters, RoleResponse} from "../lib/types";
 
 export const roleService = {
-    getAllRoles: async (): Promise<Role[]> => {
-        const response = await fetch(API_ENDPOINTS.ROLES, {
+    getAllRoles: async (filters: RoleFilters): Promise<RoleResponse> => {
+        const { page, limit, search, sortBy, sortOrder } = filters;
+        const params = [
+            `page=${page}`,
+            `limit=${limit}`,
+            search ? `search=${encodeURIComponent(search)}` : "",
+            sortBy ? `sortBy=${sortBy}` : "",
+            sortOrder ? `sortOrder=${sortOrder}` : ""
+        ].filter(Boolean).join("&");
+        const url = `${API_ENDPOINTS.ROLES}?${params}`;
+        const response = await fetch(url, {
             headers: getHeaders()
         });
         if (!response.ok) throw new Error("Error al obtener los roles");
-        const json = await response.json();
-
-        if (Array.isArray(json)) {
-            return json;
-        } else if (Array.isArray(json.data.data)) {
-            return json.data.data;
-        } else {
-            return [];
-        }
+        return await response.json();
     },
 
     createRole: async (roleData: CreateRoleDTO): Promise<Role> => {

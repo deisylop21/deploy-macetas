@@ -1,22 +1,24 @@
-import { User, CreateUserDTO, Role } from "../lib/types";
+import { User, CreateUserDTO, Role, GetRolesResponse } from "../lib/types";
 import { getHeaders } from "../../core/utils/UtilsFuntions";
 import { API_ENDPOINTS } from "../../core/lib/enpoints";
-
+import { UserFilters, UserResponse } from "../lib/types";
+{/*HOLA*/}
 export const userService = {
-    getAllUsers: async (): Promise<User[]> => {
-        const response = await fetch(API_ENDPOINTS.ADMIN_USERS, {
+    getAllUsers: async (filters: UserFilters): Promise<UserResponse> => {
+        const { page, search, sortBy, sortOrder } = filters;
+        const params = [
+            `page=${page}`,
+            search ? `search=${encodeURIComponent(search)}` : "",
+            sortBy ? `sortBy=${sortBy}` : "",
+            sortOrder ? `sortOrder=${sortOrder}` : ""
+        ].filter(Boolean).join("&");
+        const url = `${API_ENDPOINTS.ADMIN_USERS}?${params}`;
+
+        const response = await fetch(url, {
             headers: getHeaders()
         });
         if (!response.ok) throw new Error("Error al obtener los usuarios");
-        const json = await response.json();
-
-        if (Array.isArray(json)) {
-            return json;
-        } else if (Array.isArray(json.data)) {
-            return json.data;
-        } else {
-            return [];
-        }
+        return await response.json();
     },
 
     createUser: async (userData: CreateUserDTO): Promise<User> => {
@@ -37,7 +39,7 @@ export const userService = {
             headers: getHeaders()
         });
         if (!response.ok) throw new Error("Error al obtener los roles");
-        const result = await response.json();
-        return result.data.roles || [];
+        const result: GetRolesResponse = await response.json();
+        return result.data || [];
     },
 };

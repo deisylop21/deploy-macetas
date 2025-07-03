@@ -9,15 +9,32 @@ export function useUsers() {
         isLoading,
         error,
         creating,
+        totalItems,
+        totalPages,
+        filters,
         fetchUsers,
         fetchRoles,
-        createUser
+        createUser,
+        setFilters
     } = useUserStore();
 
     useEffect(() => {
         fetchUsers();
         fetchRoles();
-    }, [fetchUsers, fetchRoles]);
+        // eslint-disable-next-line
+    }, []);
+
+    const handleSearch = (search: string) => {
+        setFilters({ search, page: 1 });
+    };
+
+    const handlePageChange = (page: number) => {
+        setFilters({ page });
+    };
+
+    const handleSortChange = (sortBy: string, sortOrder: 'asc' | 'desc') => {
+        setFilters({ sortBy, sortOrder });
+    };
 
     return {
         users,
@@ -25,10 +42,17 @@ export function useUsers() {
         isLoading,
         error,
         creating,
+        totalItems,
+        totalPages,
+        filters,
         fetchUsers: () => {
             fetchUsers();
             fetchRoles();
         },
         createUser,
+        handleSearch,
+        handlePageChange,
+        handleSortChange,
+        setFilters
     };
 }

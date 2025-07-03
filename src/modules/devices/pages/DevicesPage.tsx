@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Sidebar from "../../core/components/layout/sidebar/pages/Sidebar";
 import { DataTable } from "../../core/components/ui/data-table";
 import { createDeviceColumns } from "../components/DeviceColumns";
 import { Button } from "../../core/components/ui/button";
@@ -10,6 +9,8 @@ import { DeviceUpdateModal } from "../components/DeviceUpdateModal";
 import { useDevices } from "../hooks/useDevices";
 import { Device, CreateDeviceDTO, UpdateDeviceDTO } from "../lib/types";
 import { useThemeStore } from "../../core/states/themeStore";
+import { DeviceFilters } from "../components/DeviceFilters";
+import { Pagination } from "../components/Pagination";
 
 const scrollbarHideClass = "scrollbar-none";
 
@@ -29,7 +30,12 @@ export default function DevicesPage() {
         updating,
         regenerating,
         lastCreatedLinkingCode,
-        clearLastCreatedCode
+        clearLastCreatedCode,
+        filters,
+        totalPages,
+        handleSearch,
+        handleSortChange,
+        handlePageChange
     } = useDevices();
 
     const { mode } = useThemeStore();
@@ -94,25 +100,31 @@ export default function DevicesPage() {
             `}</style>
 
             <div className={`flex h-screen ${isDark ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
-                <Sidebar />
                 <main className={`flex-1 flex flex-col ${isDark ? 'bg-gray-800' : 'bg-green-50'} overflow-hidden`}>
                     <div className="flex justify-center items-center py-8 flex-shrink-0">
                         <h1 className={`text-2xl font-bold ${isDark ? 'text-green-400' : 'text-green-900'}`}>
                             Dispositivos
                         </h1>
                     </div>
-
-                    <div className="flex justify-end px-8 mb-6 flex-shrink-0">
-                        <Button
-                            variant={isDark ? "outline" : "default"}
-                            onClick={() => setCreateModalOpen(true)}
-                            disabled={creating}
-                            className={isDark ? "bg-green-600 hover:bg-green-700 text-white" : ""}
-                        >
-                            {creating ? "Creando..." : "Crear Dispositivo"}
-                        </Button>
+                    <div className="px-8 flex-shrink-0">
+                        <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
+                            <DeviceFilters
+                                onSearch={handleSearch}
+                                onSortChange={handleSortChange}
+                                sortBy={filters.sortBy}
+                                sortOrder={filters.sortOrder}
+                                isDark={isDark}
+                            />
+                            <Button
+                                variant={isDark ? "outline" : "default"}
+                                onClick={() => setCreateModalOpen(true)}
+                                disabled={creating}
+                                className={isDark ? "bg-green-600 hover:bg-green-700 text-white" : ""}
+                            >
+                                {creating ? "Creando..." : "Crear Dispositivo"}
+                            </Button>
+                        </div>
                     </div>
-
                     <div className="px-8 flex-1 overflow-hidden">
                         {isLoading ? (
                             <div className={`flex justify-center items-center h-full ${isDark ? 'text-gray-300' : ''}`}>
@@ -128,6 +140,12 @@ export default function DevicesPage() {
                                     columns={columns}
                                     data={devices}
                                     className={isDark ? 'text-white bg-gray-800 border-gray-700' : ''}
+                                />
+                                <Pagination
+                                    currentPage={filters.page}
+                                    totalPages={totalPages}
+                                    onPageChange={handlePageChange}
+                                    isDark={isDark}
                                 />
                             </div>
                         )}

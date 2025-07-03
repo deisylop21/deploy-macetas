@@ -22,3 +22,31 @@ export interface CreateUserDTO {
     phone: string;
     roleId: string;
 }
+
+export interface GetRolesResponse {
+    data: Role[];
+    meta: {
+        page: number;
+        limit: number;
+        totalItems: number;
+        totalPages: number;
+    };
+}
+{/*HOLA*/}
+export interface UserFilters {
+    page: number;
+    limit: number;
+    search: string;
+    sortBy: string;
+    sortOrder: 'asc' | 'desc';
+}
+
+export interface UserResponse {
+    data: User[];
+    meta: {
+        page: number;
+        limit: number;
+        totalItems: number;
+        totalPages: number;
+    }
+}

@@ -21,12 +21,29 @@ export function useDevices() {
         updateDevice,
         deleteDevice,
         regenerateKey,
-        clearLastCreatedCode
+        clearLastCreatedCode,
+        totalItems,
+        totalPages,
+        filters,
+        setFilters
     } = useDeviceStore();
 
     useEffect(() => {
         fetchDevices();
-    }, [fetchDevices]);
+        // eslint-disable-next-line
+    }, []);
+
+    const handleSearch = (search: string) => {
+        setFilters({ search, page: 1 });
+    };
+
+    const handlePageChange = (page: number) => {
+        setFilters({ page });
+    };
+
+    const handleSortChange = (sortBy: string, sortOrder: "asc" | "desc") => {
+        setFilters({ sortBy, sortOrder });
+    };
 
     return {
         devices,
@@ -46,6 +63,13 @@ export function useDevices() {
         deleteError,
         regenerateError,
         lastCreatedLinkingCode,
-        clearLastCreatedCode
+        clearLastCreatedCode,
+        totalItems,
+        totalPages,
+        filters,
+        handleSearch,
+        handlePageChange,
+        handleSortChange,
+        setFilters
     };
 }

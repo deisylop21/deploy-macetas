@@ -7,7 +7,7 @@ export const ROUTES = {
         PLANT_FAMILY: "/plants/family",
         PLANT_GENUS: "/plants/genus",
         PLANT_SPECIES: "/plants/species",
-        USERS_ADMIN: "/users/admin",
+        USERS_ADMIN: "/admin-management/users",
         MODULES: "/modules",
         USER_ROLE: "/roles",
         DEVICES: "/devices"

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { deviceService } from "../services/deviceService";
-import type { Device, CreateDeviceDTO, UpdateDeviceDTO } from "../lib/types";
+import type { Device, CreateDeviceDTO, UpdateDeviceDTO, DeviceFilters } from "../lib/types";
 
 interface DeviceState {
     devices: Device[];
@@ -15,6 +15,9 @@ interface DeviceState {
     deleteError: Error | null;
     regenerateError: Error | null;
     lastCreatedLinkingCode: string | null;
+    totalItems: number;
+    totalPages: number;
+    filters: DeviceFilters;
 
     fetchDevices: () => Promise<void>;
     createDevice: (data: CreateDeviceDTO) => Promise<void>;
@@ -22,7 +25,16 @@ interface DeviceState {
     deleteDevice: (deviceId: string) => Promise<void>;
     regenerateKey: (deviceId: string) => Promise<void>;
     clearLastCreatedCode: () => void;
+    setFilters: (filters: Partial<DeviceFilters>) => void;
 }
+
+const initialFilters: DeviceFilters = {
+    page: 1,
+    limit: 10,
+    search: '',
+    sortBy: 'identifier',
+    sortOrder: 'asc'
+};
 
 export const useDeviceStore = create<DeviceState>((set, get) => ({
     devices: [],
@@ -37,12 +49,20 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
     deleteError: null,
     regenerateError: null,
     lastCreatedLinkingCode: null,
+    totalItems: 0,
+    totalPages: 0,
+    filters: initialFilters,
 
     fetchDevices: async () => {
         set({ isLoading: true, error: null });
         try {
-            const devices = await deviceService.getAllDevices();
-            set({ devices, isLoading: false });
+            const response = await deviceService.getAllDevices(get().filters);
+            set({
+                devices: response.data,
+                totalItems: response.meta.totalItems,
+                totalPages: response.meta.totalPages,
+                isLoading: false
+            });
         } catch (error) {
             set({
                 isLoading: false,
@@ -55,12 +75,8 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
         set({ creating: true, createError: null });
         try {
             const response = await deviceService.createDevice(data);
-            console.log("Dispositivo creado exitosamente:", response);
-
-            set({ lastCreatedLinkingCode: response.linking_code });
-
+            set({ lastCreatedLinkingCode: response.linking_code || null });
             await get().fetchDevices();
-
             set({ creating: false });
         } catch (error) {
             set({
@@ -74,13 +90,9 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
     updateDevice: async (deviceId: string, data: UpdateDeviceDTO) => {
         set({ updating: true, updateError: null });
         try {
-            const updatedDevice = await deviceService.updateDevice(deviceId, data);
-            set(state => ({
-                devices: state.devices.map(device =>
-                    device.id === deviceId ? updatedDevice : device
-                ),
-                updating: false
-            }));
+            await deviceService.updateDevice(deviceId, data);
+            await get().fetchDevices();
+            set({ updating: false });
         } catch (error) {
             set({
                 updating: false,
@@ -94,10 +106,8 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
         set({ deleting: true, deleteError: null });
         try {
             await deviceService.deleteDevice(deviceId);
-            set(state => ({
-                devices: state.devices.filter(device => device.id !== deviceId),
-                deleting: false
-            }));
+            await get().fetchDevices();
+            set({ deleting: false });
         } catch (error) {
             set({
                 deleting: false,
@@ -111,12 +121,8 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
         set({ regenerating: true, regenerateError: null });
         try {
             const response = await deviceService.regenerateKey(deviceId);
-            console.log("Clave regenerada exitosamente:", response);
-
             set({ lastCreatedLinkingCode: response.linking_code });
-
             await get().fetchDevices();
-
             set({ regenerating: false });
         } catch (error) {
             set({
@@ -129,5 +135,12 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
 
     clearLastCreatedCode: () => {
         set({ lastCreatedLinkingCode: null });
+    },
+
+    setFilters: (filters: Partial<DeviceFilters>) => {
+        set(state => ({
+            filters: { ...state.filters, ...filters }
+        }));
+        get().fetchDevices();
     }
 }));

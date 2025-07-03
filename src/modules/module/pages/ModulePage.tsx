@@ -9,12 +9,14 @@ import { ModuleCreateModal } from "../components/ModuleCreateModal";
 import { useModules } from "../hooks/useModules";
 import { CreateModuleDTO } from "../lib/types";
 import { useThemeStore } from "../../core/states/themeStore";
+import { ModuleFilters } from "../components/ModuleFilters";
+import { Pagination } from "../components/Pagination";
 
 const scrollbarHideClass = "scrollbar-none";
-
+{/*Hola*/}
 export default function ModulePage() {
     const [modalOpen, setModalOpen] = useState(false);
-    const { modules, isLoading, error, createModule, toggleModuleStatus, creating } = useModules();
+    const { modules, isLoading, error, createModule, toggleModuleStatus, creating, filters, handleSearch, handleSortChange, totalPages, handlePageChange, } = useModules();
     const { mode } = useThemeStore();
     const isDark = mode === 'dark';
 
@@ -49,7 +51,15 @@ export default function ModulePage() {
                             Gestión de Módulos
                         </h1>
                     </div>
-                    <div className="flex justify-end px-8 mb-6 flex-shrink-0">
+                    <div className="px-8 flex-shrink-0">
+                        <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
+                        <ModuleFilters
+                            onSearch={handleSearch}
+                            onSortChange={handleSortChange}
+                            sortBy={filters?.sortBy || "name"}
+                            sortOrder={filters?.sortOrder || "asc"}
+                            isDark={isDark}
+                        />
                         <Button
                             variant={isDark ? "outline" : "default"}
                             onClick={() => setModalOpen(true)}
@@ -58,6 +68,7 @@ export default function ModulePage() {
                         >
                             {creating ? "Creando..." : "Crear Módulo"}
                         </Button>
+                        </div>
                     </div>
                     <div className="px-8 flex-1 overflow-hidden">
                         {isLoading ? (
@@ -74,6 +85,12 @@ export default function ModulePage() {
                                     columns={columns}
                                     data={modules}
                                     className={isDark ? 'text-white bg-gray-800 border-gray-700' : ''}
+                                />
+                                <Pagination
+                                    currentPage={filters.page}
+                                    totalPages={totalPages}
+                                    onPageChange={handlePageChange}
+                                    isDark={isDark}
                                 />
                             </div>
                         )}

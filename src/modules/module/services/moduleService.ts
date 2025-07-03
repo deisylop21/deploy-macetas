@@ -1,30 +1,26 @@
 import { Module, CreateModuleDTO } from "../lib/types.ts";
 import { API_ENDPOINTS } from "../../core/lib/enpoints.ts";
 import { getHeaders } from "../../core/utils/UtilsFuntions.ts";
-
+import { ModuleFilters, ModuleResponse } from "../lib/types"
+{/*Hola*/}
 export const moduleService = {
-    getAllModules: async (): Promise<Module[]> => {
-        try {
-            const response = await fetch(API_ENDPOINTS.MODULE, {
-                headers: getHeaders()
-            });
+    getAllModules: async (filters: ModuleFilters): Promise<ModuleResponse> => {
+        const { page, limit, search, sortBy, sortOrder } = filters;
+        const params = [
+            `page=${page}`,
+            `limit=${limit}`,
+            search ? `search=${encodeURIComponent(search)}` : "",
+            sortBy ? `sortBy=${sortBy}` : "",
+            sortOrder ? `sortOrder=${sortOrder}` : ""
+        ].filter(Boolean).join("&");
+        const url = `${API_ENDPOINTS.MODULE}?${params}`;
 
-            if (!response.ok) {
-                throw new Error("Error al obtener los módulos");
-            }
-            const json = await response.json();
+        const response = await fetch(url, {
+            headers: getHeaders()
+        });
 
-            if (Array.isArray(json)) {
-                return json;
-            } else if (Array.isArray(json.data)) {
-                return json.data;
-            } else {
-                return [];
-            }
-        } catch (error) {
-            console.error("Error en getAllModules:", error);
-            throw error;
-        }
+        if (!response.ok) throw new Error("Error al obtener los módulos");
+        return await response.json();
     },
 
     createModule: async (moduleData: CreateModuleDTO): Promise<Module> => {

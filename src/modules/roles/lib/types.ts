@@ -35,3 +35,21 @@ export const validatePermissions = (permissions: PermissionType[]): boolean => {
     const hasReadPermission = permissions.includes("READ");
     return !hasOtherPermissions || (hasOtherPermissions && hasReadPermission);
 };
+
+export interface RoleFilters {
+    page: number;
+    limit: number;
+    search: string;
+    sortBy: string;
+    sortOrder: 'asc' | 'desc';
+}
+
+export interface RoleResponse {
+    data: Role[];
+    meta: {
+        page: number;
+        limit: number;
+        totalItems: number;
+        totalPages: number;
+    };
+}

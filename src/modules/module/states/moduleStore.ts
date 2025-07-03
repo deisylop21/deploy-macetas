@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { moduleService } from "../services/moduleService";
+import { moduleService, ModuleFilters } from "../services/moduleService";
 import type { Module, CreateModuleDTO } from "../lib/types";
 
 interface ModuleState {
@@ -10,11 +10,23 @@ interface ModuleState {
     toggling: boolean;
     createError: Error | null;
     toggleError: Error | null;
+    totalItems: number;
+    totalPages: number;
+    filters: ModuleFilters;
 
     fetchModules: () => Promise<void>;
     createModule: (data: CreateModuleDTO) => Promise<void>;
     toggleModuleStatus: (moduleId: string, activate: boolean) => Promise<void>;
+    setFilters: (filters: Partial<ModuleFilters>) => void;
 }
+
+const initialFilters: ModuleFilters = {
+    page: 1,
+    limit: 10,
+    search: '',
+    sortBy: 'name',
+    sortOrder: 'asc'
+};
 
 export const useModuleStore = create<ModuleState>((set, get) => ({
     modules: [],
@@ -24,12 +36,20 @@ export const useModuleStore = create<ModuleState>((set, get) => ({
     toggling: false,
     createError: null,
     toggleError: null,
+    totalItems: 0,
+    totalPages: 0,
+    filters: initialFilters,
 
     fetchModules: async () => {
         set({ isLoading: true, error: null });
         try {
-            const modules = await moduleService.getAllModules();
-            set({ modules, isLoading: false });
+            const response = await moduleService.getAllModules(get().filters);
+            set({
+                modules: response.data,
+                isLoading: false,
+                totalItems: response.meta.totalItems,
+                totalPages: response.meta.totalPages
+            });
         } catch (error) {
             set({
                 isLoading: false,
@@ -41,11 +61,9 @@ export const useModuleStore = create<ModuleState>((set, get) => ({
     createModule: async (data: CreateModuleDTO) => {
         set({ creating: true, createError: null });
         try {
-            const newModule = await moduleService.createModule(data);
-            set(state => ({
-                modules: [...state.modules, newModule],
-                creating: false
-            }));
+            await moduleService.createModule(data);
+            set({ creating: false });
+            get().fetchModules();
         } catch (error) {
             set({
                 creating: false,
@@ -58,14 +76,9 @@ export const useModuleStore = create<ModuleState>((set, get) => ({
     toggleModuleStatus: async (moduleId: string, activate: boolean) => {
         set({ toggling: true, toggleError: null });
         try {
-            const updatedModule = await moduleService.updateModuleStatus(moduleId, activate);
-
-            set(state => ({
-                modules: state.modules.map(module =>
-                    module.id === moduleId ? updatedModule : module
-                ),
-                toggling: false
-            }));
+            await moduleService.updateModuleStatus(moduleId, activate);
+            set({ toggling: false });
+            get().fetchModules();
         } catch (error) {
             set({
                 toggling: false,
@@ -73,5 +86,12 @@ export const useModuleStore = create<ModuleState>((set, get) => ({
             });
             throw error;
         }
+    },
+
+    setFilters: (filters: Partial<ModuleFilters>) => {
+        set(state => ({
+            filters: { ...state.filters, ...filters }
+        }));
+        get().fetchModules();
     }
 }));

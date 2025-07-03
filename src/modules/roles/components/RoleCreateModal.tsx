@@ -190,7 +190,7 @@ export function RoleCreateModal({
                                                 {module.name}
                                             </h4>
                                             <div className="flex flex-wrap gap-4">
-                                                {(["read", "CREATE", "UPDATE", "DELETE"] as PermissionType[]).map(permission => {
+                                                {(["READ", "CREATE", "UPDATE", "DELETE"] as PermissionType[]).map(permission => {
                                                     const isChecked = modulePermissions[module.id]?.includes(permission) || false;
                                                     const isReadOnlyDisabled =
                                                         permission === "READ" &&

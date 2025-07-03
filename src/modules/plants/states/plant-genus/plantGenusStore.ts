@@ -76,19 +76,15 @@ export const usePlantGenusStore = create<PlantGenusState>((set, get) => ({
     },
 
     updateGenus: async (id: string, data: UpdatePlantGenusDTO) => {
-        set({ updating: true, error: null });
+        set({ updating: true, updateError: null });
         try {
-            const updatedGenus = await plantGenusService.updatePlantGenus(id, data);
-            set(state => ({
-                genera: state.genera.map(genus =>
-                    genus.id === id ? updatedGenus : genus
-                ),
-                updating: false
-            }));
+            await plantGenusService.updatePlantGenus(id, data);
+            await get().fetchGenera();
+            set({ updating: false });
         } catch (error) {
             set({
                 updating: false,
-                error: error instanceof Error ? error.message : "Error al actualizar género de planta"
+                updateError: error instanceof Error ? error : new Error("Error al actualizar género de planta")
             });
             throw error;
         }

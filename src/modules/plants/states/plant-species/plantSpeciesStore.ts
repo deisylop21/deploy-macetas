@@ -75,19 +75,15 @@ export const usePlantSpeciesStore = create<PlantSpeciesState>((set, get) => ({
     },
 
     updateSpecies: async (id: string, data: UpdatePlantSpeciesDTO) => {
-        set({ updating: true, error: null });
+        set({ updating: true, updateError: null });
         try {
-            const updatedSpecies = await plantSpeciesService.updatePlantSpecies(id, data);
-            set(state => ({
-                species: state.species.map(species =>
-                    species.id === id ? updatedSpecies : species
-                ),
-                updating: false
-            }));
+            await plantSpeciesService.updatePlantSpecies(id, data);
+            await get().fetchSpecies();
+            set({ updating: false });
         } catch (error) {
             set({
                 updating: false,
-                error: error instanceof Error ? error.message : "Error al actualizar especie de planta"
+                updateError: error instanceof Error ? error : new Error("Error al actualizar especie de planta")
             });
             throw error;
         }

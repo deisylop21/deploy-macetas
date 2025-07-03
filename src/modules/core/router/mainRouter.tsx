@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import PublicRouter from "./routers/PublicRouter";
 import PrivateRouter from "./routers/PrivateRouter";
-import MainLayout from "../components/layout/MainLayout.tsx";
+import MainLayout from "../components/layout/MainLayout";
 import { ROUTES } from "./path";
 import LoginPage from "../../auth/pages/LoginPage";
 import ForgotPasswordPage from "../../auth/pages/ForgotPasswordPage";

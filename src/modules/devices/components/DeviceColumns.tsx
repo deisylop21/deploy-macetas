@@ -5,8 +5,7 @@ import { Button } from "../../core/components/ui/button";
 import { Device } from "../lib/types";
 
 export const createDeviceColumns = (
-    onEdit: (device: Device) => void,
-    onDelete: (device: Device) => void,
+    onShowDetails: (device: Device) => void,
     onRegenerateKey: (device: Device) => void,
     isDark: boolean = false
 ): ColumnDef<Device>[] => [
@@ -27,15 +26,22 @@ export const createDeviceColumns = (
         header: "Estado",
         cell: ({ getValue }) => {
             const value = getValue() as string;
-            const isAvailable = value === "AVAILABLE";
+            let estado = "Desconocido";
+            let clase = "bg-gray-200 text-gray-700";
+            if (value === "AVAILABLE") {
+                estado = "Disponible";
+                clase = "bg-green-100 text-green-800";
+            } else if (value === "DISABLED") {
+                estado = "Deshabilitado";
+                clase = "bg-red-100 text-red-800";
+            } else if (value === "LINKED") {
+                estado = "Vinculado";
+                clase = "bg-blue-100 text-blue-800";
+            }
             return (
                 <div className="flex justify-left">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold min-w-[100px] text-center ${
-                        isAvailable
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
-                    }`}>
-                        {isAvailable ? "Disponible" : "Deshabilitado"}
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold min-w-[100px] text-center ${clase}`}>
+                        {estado}
                     </span>
                 </div>
             );
@@ -48,7 +54,7 @@ export const createDeviceColumns = (
             const value = getValue() as string;
             return (
                 <span className={`${isDark ? 'text-gray-300' : 'text-gray-700'} font-mono font-semibold`}>
-                    {value}
+                    {value || "-"}
                 </span>
             );
         }
@@ -63,10 +69,10 @@ export const createDeviceColumns = (
                     <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => onEdit(device)}
+                        onClick={() => onShowDetails(device)}
                         className={`text-xs ${isDark ? "border-gray-600 text-white hover:bg-gray-700" : ""}`}
                     >
-                        Editar
+                        Detalles
                     </Button>
                     <Button
                         variant="outline"

@@ -7,8 +7,12 @@ interface ModuleState {
     isLoading: boolean;
     error: string | null;
     creating: boolean;
+    updating: boolean;
+    deleting: boolean;
     toggling: boolean;
     createError: Error | null;
+    updateError: Error | null;
+    deleteError: Error | null;
     toggleError: Error | null;
     totalItems: number;
     totalPages: number;
@@ -16,6 +20,8 @@ interface ModuleState {
 
     fetchModules: () => Promise<void>;
     createModule: (data: CreateModuleDTO) => Promise<void>;
+    updateModule: (id: string, data: Partial<Module>) => Promise<void>;
+    deleteModule: (id: string) => Promise<void>;
     toggleModuleStatus: (moduleId: string, activate: boolean) => Promise<void>;
     setFilters: (filters: Partial<ModuleFilters>) => void;
 }
@@ -33,8 +39,12 @@ export const useModuleStore = create<ModuleState>((set, get) => ({
     isLoading: false,
     error: null,
     creating: false,
+    updating: false,
+    deleting: false,
     toggling: false,
     createError: null,
+    updateError: null,
+    deleteError: null,
     toggleError: null,
     totalItems: 0,
     totalPages: 0,
@@ -63,11 +73,41 @@ export const useModuleStore = create<ModuleState>((set, get) => ({
         try {
             await moduleService.createModule(data);
             set({ creating: false });
-            get().fetchModules();
+            await get().fetchModules();
         } catch (error) {
             set({
                 creating: false,
                 createError: error instanceof Error ? error : new Error("Error al crear el módulo")
+            });
+            throw error;
+        }
+    },
+
+    updateModule: async (id: string, data: Partial<Module>) => {
+        set({ updating: true, updateError: null });
+        try {
+            await moduleService.updateModule(id, data);
+            set({ updating: false });
+            await get().fetchModules();
+        } catch (error) {
+            set({
+                updating: false,
+                updateError: error instanceof Error ? error : new Error("Error al actualizar el módulo")
+            });
+            throw error;
+        }
+    },
+
+    deleteModule: async (id: string) => {
+        set({ deleting: true, deleteError: null });
+        try {
+            await moduleService.deleteModule(id);
+            set({ deleting: false });
+            await get().fetchModules();
+        } catch (error) {
+            set({
+                deleting: false,
+                deleteError: error instanceof Error ? error : new Error("Error al eliminar el módulo")
             });
             throw error;
         }
@@ -78,7 +118,7 @@ export const useModuleStore = create<ModuleState>((set, get) => ({
         try {
             await moduleService.updateModuleStatus(moduleId, activate);
             set({ toggling: false });
-            get().fetchModules();
+            await get().fetchModules();
         } catch (error) {
             set({
                 toggling: false,

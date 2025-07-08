@@ -8,7 +8,7 @@ const MainLayout = () => {
     return (
         <div className="flex flex-col min-h-screen relative">
             <Navbar />
-            <div className="h-16 w-full" /> {/* Espaciador, igual al alto del navbar */}
+            <div className="h-16 w-full" />
             <div className="flex flex-row flex-1">
                 <Sidebar />
                 <main

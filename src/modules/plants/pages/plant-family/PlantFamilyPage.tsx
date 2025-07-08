@@ -149,7 +149,6 @@ export default function PlantFamilyPage() {
                                     data={families}
                                     className={isDark ? 'text-white bg-gray-800 border-gray-700' : ''}
                                 />
-
                                 <Pagination
                                     currentPage={filters.page}
                                     totalPages={totalPages}

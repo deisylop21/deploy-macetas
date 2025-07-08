@@ -71,7 +71,6 @@ export const useRoleStore = create<RoleState>((set, get) => ({
     createRole: async (roleData: CreateRoleDTO) => {
         set({ creating: true, error: null });
         try {
-            // Validación de permisos
             const hasInvalidPermissions = roleData.permissions.some(
                 modulePermission => !validatePermissions(modulePermission.permissions)
             );
@@ -79,10 +78,8 @@ export const useRoleStore = create<RoleState>((set, get) => ({
                 throw new Error("Si se selecciona Crear, Editar o Eliminar, el permiso Ver debe estar incluido");
             }
 
-            // Crear el rol
             await roleService.createRole(roleData);
 
-            // Refresca la lista completa (para mantener paginación y filtros)
             await get().fetchRoles();
 
             set({ creating: false });

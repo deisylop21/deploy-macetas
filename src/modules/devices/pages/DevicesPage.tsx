@@ -6,17 +6,20 @@ import { createDeviceColumns } from "../components/DeviceColumns";
 import { Button } from "../../core/components/ui/button";
 import { DeviceCreateModal } from "../components/DeviceCreateModal";
 import { DeviceUpdateModal } from "../components/DeviceUpdateModal";
+import { DeviceDetailsModal } from "../components/DeviceDetailsModal";
 import { useDevices } from "../hooks/useDevices";
 import { Device, CreateDeviceDTO, UpdateDeviceDTO } from "../lib/types";
 import { useThemeStore } from "../../core/states/themeStore";
 import { DeviceFilters } from "../components/DeviceFilters";
 import { Pagination } from "../components/Pagination";
+import { deviceService } from "../services/deviceService";
 
 const scrollbarHideClass = "scrollbar-none";
 
 export default function DevicesPage() {
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [updateModalOpen, setUpdateModalOpen] = useState(false);
+    const [detailsModalOpen, setDetailsModalOpen] = useState(false);
     const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
 
     const {
@@ -41,26 +44,32 @@ export default function DevicesPage() {
     const { mode } = useThemeStore();
     const isDark = mode === 'dark';
 
+    const handleShowDetails = async (device: Device) => {
+        setSelectedDevice(device);
+        setDetailsModalOpen(true);
+
+        try {
+            const deviceDetails = await deviceService.getDeviceById(device.id);
+            setSelectedDevice(deviceDetails);
+        } catch (err) {
+        }
+    };
+
     const handleEdit = (device: Device) => {
         setSelectedDevice(device);
         setUpdateModalOpen(true);
-    };
-
-    const handleDelete = (device: Device) => {
-        console.log("Función eliminar no disponible - endpoint no existe");
-        alert("La función eliminar no está disponible en el backend actual");
+        setDetailsModalOpen(false);
     };
 
     const handleRegenerateKey = async (device: Device) => {
         try {
             await regenerateKey(device.id);
-            console.log(`Clave regenerada para dispositivo: ${device.identifier}`);
         } catch (error) {
             console.error("Error al regenerar la clave:", error);
         }
     };
 
-    const columns = createDeviceColumns(handleEdit, handleDelete, handleRegenerateKey, isDark);
+    const columns = createDeviceColumns(handleShowDetails, handleRegenerateKey, isDark);
 
     const handleDeviceCreated = async (deviceData: CreateDeviceDTO) => {
         try {
@@ -167,6 +176,15 @@ export default function DevicesPage() {
                         }}
                         onSubmitSuccess={handleDeviceUpdated}
                         device={selectedDevice || undefined}
+                        isDark={isDark}
+                    />
+
+                    <DeviceDetailsModal
+                        open={detailsModalOpen}
+                        device={selectedDevice || undefined}
+                        onClose={() => setDetailsModalOpen(false)}
+                        onEdit={handleEdit}
+                        onRegenerateKey={handleRegenerateKey}
                         isDark={isDark}
                     />
                 </main>

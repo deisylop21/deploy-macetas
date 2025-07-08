@@ -22,7 +22,6 @@ interface DeviceState {
     fetchDevices: () => Promise<void>;
     createDevice: (data: CreateDeviceDTO) => Promise<void>;
     updateDevice: (deviceId: string, data: UpdateDeviceDTO) => Promise<void>;
-    deleteDevice: (deviceId: string) => Promise<void>;
     regenerateKey: (deviceId: string) => Promise<void>;
     clearLastCreatedCode: () => void;
     setFilters: (filters: Partial<DeviceFilters>) => void;
@@ -97,21 +96,6 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             set({
                 updating: false,
                 updateError: error instanceof Error ? error : new Error("Error al actualizar el dispositivo")
-            });
-            throw error;
-        }
-    },
-
-    deleteDevice: async (deviceId: string) => {
-        set({ deleting: true, deleteError: null });
-        try {
-            await deviceService.deleteDevice(deviceId);
-            await get().fetchDevices();
-            set({ deleting: false });
-        } catch (error) {
-            set({
-                deleting: false,
-                deleteError: error instanceof Error ? error : new Error("Error al eliminar el dispositivo")
             });
             throw error;
         }

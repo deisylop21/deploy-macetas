@@ -42,6 +42,7 @@ const StatusCell = ({ moduleId, isActive, onToggle, isDark }: StatusCellProps) =
 
 export const createModuleColumns = (
     onToggleStatus: (moduleId: string, newStatus: boolean) => Promise<void>,
+    onShowDetails: (module: Module) => void,
     isDark: boolean = false
 ): ColumnDef<Module>[] => [
     {
@@ -80,6 +81,23 @@ export const createModuleColumns = (
                     onToggle={onToggleStatus}
                     isDark={isDark}
                 />
+            );
+        },
+    },
+    {
+        id: "actions",
+        header: "Acciones",
+        cell: ({ row }) => {
+            const module = row.original;
+            return (
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onShowDetails(module)}
+                    className={`text-xs ${isDark ? "border-gray-600 text-white hover:bg-gray-700" : ""}`}
+                >
+                    Detalles
+                </Button>
             );
         },
     },

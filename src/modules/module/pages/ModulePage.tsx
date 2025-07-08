@@ -6,30 +6,103 @@ import { DataTable } from "../../core/components/ui/data-table";
 import { createModuleColumns } from "../components/ModuleColumns";
 import { Button } from "../../core/components/ui/button";
 import { ModuleCreateModal } from "../components/ModuleCreateModal";
+import { ModuleDetailsModal } from "../components/ModuleDetailsModal";
+import { ModuleEditModal } from "../components/ModuleEditModal";
+import { ModuleDeleteModal } from "../components/ModuleDeleteModal";
 import { useModules } from "../hooks/useModules";
-import { CreateModuleDTO } from "../lib/types";
+import { Module, CreateModuleDTO } from "../lib/types";
 import { useThemeStore } from "../../core/states/themeStore";
 import { ModuleFilters } from "../components/ModuleFilters";
 import { Pagination } from "../components/Pagination";
 
+type EditModuleDTO = {
+    name: string;
+    description: string;
+    is_active: boolean;
+};
+
 const scrollbarHideClass = "scrollbar-none";
-{/*Hola*/}
 export default function ModulePage() {
     const [modalOpen, setModalOpen] = useState(false);
-    const { modules, isLoading, error, createModule, toggleModuleStatus, creating, filters, handleSearch, handleSortChange, totalPages, handlePageChange, } = useModules();
+    const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [selectedModule, setSelectedModule] = useState<Module | null>(null);
+
+    const {
+        modules,
+        isLoading,
+        error,
+        createModule,
+        updateModule,
+        deleteModule,
+        toggleModuleStatus,
+        creating,
+        updating,
+        deleting,
+        filters,
+        handleSearch,
+        handleSortChange,
+        totalPages,
+        handlePageChange,
+    } = useModules();
+
     const { mode } = useThemeStore();
     const isDark = mode === 'dark';
 
-    const columns = createModuleColumns(toggleModuleStatus, isDark);
+    const columns = createModuleColumns(
+        toggleModuleStatus,
+        handleShowDetails,
+        isDark
+    );
 
-    const handleModuleCreated = async (moduleData: CreateModuleDTO) => {
+    function handleShowDetails(module: Module) {
+        setSelectedModule(module);
+        setDetailsModalOpen(true);
+    }
+
+    function handleEditClick(module: Module) {
+        setSelectedModule(module);
+        setEditModalOpen(true);
+        setDetailsModalOpen(false);
+    }
+
+    function handleDeleteClick(module: Module) {
+        setSelectedModule(module);
+        setDeleteModalOpen(true);
+        setDetailsModalOpen(false);
+    }
+
+    async function handleModuleCreated(moduleData: CreateModuleDTO) {
         try {
             await createModule(moduleData);
             setModalOpen(false);
         } catch (error) {
             console.error("Error al crear módulo:", error);
         }
-    };
+    }
+
+    async function handleModuleUpdated(data: EditModuleDTO) {
+        if (selectedModule) {
+            try {
+                await updateModule(selectedModule.id, data);
+                setEditModalOpen(false);
+                setSelectedModule(null);
+            } catch (error) {
+                console.error("Error al actualizar módulo:", error);
+            }
+        }
+    }
+
+    async function handleModuleDeleted(module: Module) {
+        try {
+            await deleteModule(module.id);
+            setDeleteModalOpen(false);
+            setSelectedModule(null);
+        } catch (error) {
+            console.error("Error al eliminar módulo:", error);
+        }
+    }
 
     return (
         <>
@@ -53,21 +126,21 @@ export default function ModulePage() {
                     </div>
                     <div className="px-8 flex-shrink-0">
                         <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
-                        <ModuleFilters
-                            onSearch={handleSearch}
-                            onSortChange={handleSortChange}
-                            sortBy={filters?.sortBy || "name"}
-                            sortOrder={filters?.sortOrder || "asc"}
-                            isDark={isDark}
-                        />
-                        <Button
-                            variant={isDark ? "outline" : "default"}
-                            onClick={() => setModalOpen(true)}
-                            disabled={creating}
-                            className={isDark ? "bg-green-600 hover:bg-green-700 text-white" : ""}
-                        >
-                            {creating ? "Creando..." : "Crear Módulo"}
-                        </Button>
+                            <ModuleFilters
+                                onSearch={handleSearch}
+                                onSortChange={handleSortChange}
+                                sortBy={filters?.sortBy || "name"}
+                                sortOrder={filters?.sortOrder || "asc"}
+                                isDark={isDark}
+                            />
+                            <Button
+                                variant={isDark ? "outline" : "default"}
+                                onClick={() => setModalOpen(true)}
+                                disabled={creating}
+                                className={isDark ? "bg-green-600 hover:bg-green-700 text-white" : ""}
+                            >
+                                {creating ? "Creando..." : "Crear Módulo"}
+                            </Button>
                         </div>
                     </div>
                     <div className="px-8 flex-1 overflow-hidden">
@@ -101,6 +174,33 @@ export default function ModulePage() {
                         onClose={() => setModalOpen(false)}
                         onSubmitSuccess={handleModuleCreated}
                         isDark={isDark}
+                    />
+
+                    <ModuleDetailsModal
+                        open={detailsModalOpen}
+                        module={selectedModule || undefined}
+                        onClose={() => setDetailsModalOpen(false)}
+                        onEdit={handleEditClick}
+                        onDelete={handleDeleteClick}
+                        isDark={isDark}
+                    />
+
+                    <ModuleEditModal
+                        open={editModalOpen}
+                        module={selectedModule || undefined}
+                        onClose={() => setEditModalOpen(false)}
+                        onSubmitSuccess={handleModuleUpdated}
+                        isDark={isDark}
+                        loading={updating}
+                    />
+
+                    <ModuleDeleteModal
+                        open={deleteModalOpen}
+                        module={selectedModule || undefined}
+                        onClose={() => setDeleteModalOpen(false)}
+                        onConfirm={handleModuleDeleted}
+                        isDark={isDark}
+                        loading={deleting}
                     />
                 </main>
             </div>

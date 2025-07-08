@@ -1,12 +1,12 @@
 export interface Device {
     id: string;
-    status: "AVAILABLE" | "DISABLED";
+    status: "AVAILABLE" | "DISABLED" | "LINKED";
     identifier: string;
     linking_key?: string;
     registered_at?: string;
     linked_at?: string | null;
 }
-{/*Adios*/}
+
 export interface CreateDeviceDTO {
     identifier: string;
 }
@@ -18,27 +18,29 @@ export interface CreateDeviceResponse {
 
 export interface UpdateDeviceDTO {
     identifier?: string;
-    status?: "AVAILABLE" | "DISABLED";
+    status?: "AVAILABLE" | "DISABLED" | "LINKED";
 }
 
 export interface GetDevicesResponse {
-    message: string;
     data: Device[];
+    meta: {
+        page: number;
+        limit: number;
+        totalItems: number;
+        totalPages: number;
+    };
 }
 
-export interface GetDeviceResponse {
-    message: string;
-    device: Device;
-}
+export interface GetDeviceResponse extends Device {}
 
 export interface UpdateDeviceResponse {
     id: string;
 }
 
 export interface RegenerateKeyResponse {
-    message: string;
     linking_code: string;
 }
+
 export interface DeviceFilters {
     page: number;
     limit: number;

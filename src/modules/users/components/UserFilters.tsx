@@ -71,7 +71,6 @@ export function UserFilters({
                     }`}
                 >
                     <option value="name">Nombre</option>
-                    {/*<option value="registed_at">Fecha de creación</option>*/}
                 </select>
                 <Button
                     onClick={handleSortOrderChange}

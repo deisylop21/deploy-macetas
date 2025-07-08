@@ -6,7 +6,7 @@ import SidebarItem from "../components/SidebarItem.tsx";
 import SidebarSubItem from "../components/SidebarSubItem.tsx";
 import { MenuItem, SidebarProps } from "../lib/types.ts";
 
-// ICON IMPORTS (mantén los tuyos aquí)
+
 import { ReactComponent as StatsIcon } from "../../../../../../assets/icons/StatsIcon.svg";
 import { ReactComponent as PlantIcon } from "../../../../../../assets/icons/PlantIcon.svg";
 import { ReactComponent as FaqIcon } from "../../../../../../assets/icons/FaqIcon.svg";
@@ -26,12 +26,11 @@ import { ReactComponent as SpeciesPlantsIcon } from "../../../../../../assets/ic
 import { ReactComponent as DevicesIcon } from "../../../../../../assets/icons/DevicesIcon.svg";
 
 const SIDEBAR_WIDTH = "w-64";
-const NAVBAR_HEIGHT = "h-16"; // 64px = 4rem
+const NAVBAR_HEIGHT = "h-16"
 
 const scrollbarHideClass = "scrollbar-none";
 
 const Sidebar = ({ user }: SidebarProps) => {
-    // <-- AHORA sí incluye toggleSidebar aquí -->
     const { open, getSubmenuState, toggleSubmenu, toggleSidebar } = useSidebarState();
     const location = useLocation();
     const pathname = location.pathname;
@@ -142,7 +141,6 @@ const Sidebar = ({ user }: SidebarProps) => {
 
     return (
         <>
-            {/* Overlay solo debajo del navbar */}
             {open && (
                 <div
                     className="fixed left-0 top-16 w-full h-[calc(100vh-4rem)] z-40 bg-black bg-opacity-30 md:hidden"
@@ -163,7 +161,6 @@ const Sidebar = ({ user }: SidebarProps) => {
                 `}
                 style={{ transitionProperty: "transform" }}
             >
-                {/* Hamburguesa removida */}
                 <div className={`flex-1 overflow-y-auto ${scrollbarHideClass}`}>
                     <ul className="flex flex-col gap-2 mt-2 pb-4">
                         {menuItems.map((item) => {

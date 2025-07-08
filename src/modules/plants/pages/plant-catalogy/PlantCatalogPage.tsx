@@ -109,7 +109,7 @@ export default function PlantCatalogPage() {
 
                         onSortByChange={handleSortByChange}
                         onSortOrderChange={handleSortOrderChange}
-                        sortBy={filters.sortBy || "name"}           //aqui
+                        sortBy={filters.sortBy || "name"}
                         sortOrder={filters.sortOrder || "asc"}
                         isDark={isDark}
                     />

@@ -11,11 +11,17 @@ export function useModules() {
         totalPages,
         filters,
         creating,
+        updating,
+        deleting,
         toggling,
         createError,
+        updateError,
+        deleteError,
         toggleError,
         fetchModules,
         createModule,
+        updateModule,
+        deleteModule,
         toggleModuleStatus,
         setFilters
     } = useModuleStore();
@@ -33,7 +39,6 @@ export function useModules() {
         setFilters({ page });
     };
 
-    // Puedes agregar limit y sort igual que familias si los usas
     const handleLimitChange = (limit: number) => {
         setFilters({ limit, page: 1 });
     };
@@ -50,11 +55,17 @@ export function useModules() {
         totalPages,
         filters,
         creating,
+        updating,
+        deleting,
         toggling,
         createError,
+        updateError,
+        deleteError,
         toggleError,
         fetchModules,
         createModule,
+        updateModule,
+        deleteModule,
         toggleModuleStatus,
         handleSearch,
         handlePageChange,

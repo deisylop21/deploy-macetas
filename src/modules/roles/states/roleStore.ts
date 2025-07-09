@@ -9,13 +9,16 @@ interface RoleState {
     isLoading: boolean;
     error: string | null;
     creating: boolean;
+    updating: boolean;
     totalItems: number;
     totalPages: number;
     filters: RoleFilters;
 
     fetchRoles: () => Promise<void>;
     fetchModules: () => Promise<void>;
+    getRoleById: (roleId: string) => Promise<Role>;
     createRole: (roleData: CreateRoleDTO) => Promise<void>;
+    updateRole: (roleId: string, patch: Partial<Role>) => Promise<void>;
     setFilters: (filters: Partial<RoleFilters>) => void;
 }
 
@@ -33,6 +36,7 @@ export const useRoleStore = create<RoleState>((set, get) => ({
     isLoading: false,
     error: null,
     creating: false,
+    updating: false,
     totalItems: 0,
     totalPages: 0,
     filters: initialFilters,
@@ -68,6 +72,18 @@ export const useRoleStore = create<RoleState>((set, get) => ({
         }
     },
 
+    getRoleById: async (roleId: string) => {
+        set({ isLoading: true });
+        try {
+            const role = await roleService.getRoleById(roleId);
+            set({ isLoading: false });
+            return role;
+        } catch (error) {
+            set({ isLoading: false });
+            throw error;
+        }
+    },
+
     createRole: async (roleData: CreateRoleDTO) => {
         set({ creating: true, error: null });
         try {
@@ -87,6 +103,32 @@ export const useRoleStore = create<RoleState>((set, get) => ({
             set({
                 creating: false,
                 error: error instanceof Error ? error.message : "Error al crear el rol"
+            });
+            throw error;
+        }
+    },
+
+    updateRole: async (roleId: string, patch: Partial<Role>) => {
+        set({ updating: true, error: null });
+        try {
+            if (patch.permissions) {
+                const hasInvalidPermissions = patch.permissions.some(
+                    modulePermission => !validatePermissions(modulePermission.permissions)
+                );
+                if (hasInvalidPermissions) {
+                    throw new Error("Si se selecciona Crear, Editar o Eliminar, el permiso Ver debe estar incluido");
+                }
+            }
+
+            await roleService.updateRole(roleId, patch);
+
+            await get().fetchRoles();
+
+            set({ updating: false });
+        } catch (error) {
+            set({
+                updating: false,
+                error: error instanceof Error ? error.message : "Error al actualizar el rol"
             });
             throw error;
         }

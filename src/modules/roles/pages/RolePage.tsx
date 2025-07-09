@@ -7,32 +7,62 @@ import { createRoleColumns } from "../components/RoleColumns";
 import { Button } from "../../core/components/ui/button";
 import { RoleCreateModal } from "../components/RoleCreateModal";
 import { useRoles } from "../hooks/useRoles";
-import { CreateRoleDTO } from "../lib/types";
+import { CreateRoleDTO, Role } from "../lib/types";
 import { useThemeStore } from "../../core/states/themeStore";
 import { RolesFilters } from "../components/RolesFilters";
 import { Pagination } from "../components/Pagination";
+import { RoleDetailsModal } from "../components/RoleDetailsModal";
+import { RoleUpdateModal } from "../components/RoleUpdateModal";
 
 const scrollbarHideClass = "scrollbar-none";
 
 export default function RolePage() {
     const [modalOpen, setModalOpen] = useState(false);
+    const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+    const [updateModalOpen, setUpdateModalOpen] = useState(false);
+    const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+
     const {
         roles,
         modules,
         isLoading,
         error,
         createRole,
+        updateRole,
         creating,
+        updating,
         filters,
         totalPages,
         handleSearch,
         handleSortChange,
-        handlePageChange
+        handlePageChange,
+        getRoleById
     } = useRoles();
     const { mode } = useThemeStore();
     const isDark = mode === 'dark';
 
-    const columns = createRoleColumns(isDark);
+    const columns = createRoleColumns(
+        handleShowDetails,
+        isDark
+    );
+
+    async function handleShowDetails(role: Role) {
+        setSelectedRole(role);
+        setDetailsModalOpen(true);
+
+        try {
+            const details = await getRoleById(role.id);
+            setSelectedRole(details);
+        } catch (e) {
+            // no-op
+        }
+    }
+
+    const handleEdit = (role: Role) => {
+        setSelectedRole(role);
+        setUpdateModalOpen(true);
+        setDetailsModalOpen(false);
+    };
 
     const handleRoleCreated = async (roleData: CreateRoleDTO) => {
         try {
@@ -40,6 +70,18 @@ export default function RolePage() {
             setModalOpen(false);
         } catch (error) {
             console.error("Error en la interfaz al crear rol:", error);
+        }
+    };
+
+    const handleRoleUpdated = async (patch: Partial<Role>) => {
+        try {
+            if (selectedRole) {
+                await updateRole(selectedRole.id, patch);
+                setUpdateModalOpen(false);
+                setSelectedRole(null);
+            }
+        } catch (error) {
+            console.error("Error en la interfaz al actualizar rol:", error);
         }
     };
 
@@ -112,6 +154,27 @@ export default function RolePage() {
                         open={modalOpen}
                         onClose={() => setModalOpen(false)}
                         onSubmitSuccess={handleRoleCreated}
+                        modules={modules}
+                        isDark={isDark}
+                    />
+
+                    <RoleDetailsModal
+                        open={detailsModalOpen}
+                        modules={modules}
+                        role={selectedRole || undefined}
+                        onClose={() => setDetailsModalOpen(false)}
+                        onEdit={handleEdit}
+                        isDark={isDark}
+                    />
+
+                    <RoleUpdateModal
+                        open={updateModalOpen}
+                        onClose={() => {
+                            setUpdateModalOpen(false);
+                            setSelectedRole(null);
+                        }}
+                        onSubmitSuccess={handleRoleUpdated}
+                        role={selectedRole || undefined}
                         modules={modules}
                         isDark={isDark}
                     />

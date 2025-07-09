@@ -3,9 +3,13 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Switch } from "../../core/components/ui/switch";
 import { Role } from "../lib/types";
+import { Button } from "../../core/components/ui/button";
 import * as React from "react";
 
-export const createRoleColumns = (isDark: boolean = false): ColumnDef<Role>[] => [
+export const createRoleColumns = (
+    onShowDetails: (role: Role) => void,
+    isDark: boolean = false
+): ColumnDef<Role>[] => [
     {
         accessorKey: "name",
         header: "Nombre",
@@ -46,6 +50,24 @@ export const createRoleColumns = (isDark: boolean = false): ColumnDef<Role>[] =>
                         {isActive ? "Activo" : "Inactivo"}
                     </span>
                 </div>
+            );
+        },
+    },
+    {
+        id: "actions",
+        header: "Acciones",
+        cell: ({ row }) => {
+            const role = row.original;
+            const isActive = role.is_active;
+            return (
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onShowDetails(role)}
+                    className={`text-xs ${isActive ? "" : "opacity-60"} ${isDark ? "border-gray-600 text-white hover:bg-gray-700" : ""}`}
+                >
+                    Detalles
+                </Button>
             );
         },
     },

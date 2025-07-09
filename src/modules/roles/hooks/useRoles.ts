@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useRoleStore } from "../states/roleStore";
-import { CreateRoleDTO } from "../lib/types";
+import { CreateRoleDTO, Role } from "../lib/types";
 
 export function useRoles() {
     const {
@@ -9,12 +9,15 @@ export function useRoles() {
         isLoading,
         error,
         creating,
+        updating,
         totalItems,
         totalPages,
         filters,
         fetchRoles,
         fetchModules,
         createRole,
+        updateRole,
+        getRoleById,
         setFilters
     } = useRoleStore();
 
@@ -42,6 +45,7 @@ export function useRoles() {
         isLoading,
         error,
         creating,
+        updating,
         totalItems,
         totalPages,
         filters,
@@ -50,6 +54,8 @@ export function useRoles() {
             fetchModules();
         },
         createRole,
+        updateRole,
+        getRoleById,
         handleSearch,
         handlePageChange,
         handleSortChange,

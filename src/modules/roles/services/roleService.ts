@@ -2,7 +2,7 @@ import { Role, CreateRoleDTO } from "../lib/types";
 import { Module } from "../../module/lib/types";
 import { API_ENDPOINTS } from "../../core/lib/enpoints";
 import { getHeaders } from "../../core/utils/UtilsFuntions";
-import { RoleFilters, RoleResponse} from "../lib/types";
+import { RoleFilters, RoleResponse } from "../lib/types";
 
 export const roleService = {
     getAllRoles: async (filters: RoleFilters): Promise<RoleResponse> => {
@@ -22,6 +22,14 @@ export const roleService = {
         return await response.json();
     },
 
+    getRoleById: async (roleId: string): Promise<Role> => {
+        const response = await fetch(API_ENDPOINTS.ROLES + "/" + roleId, {
+            headers: getHeaders()
+        });
+        if (!response.ok) throw new Error("Error al obtener el rol");
+        return await response.json();
+    },
+
     createRole: async (roleData: CreateRoleDTO): Promise<Role> => {
         const response = await fetch(API_ENDPOINTS.ROLES, {
             method: "POST",
@@ -31,6 +39,19 @@ export const roleService = {
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.message || "Error al crear el rol");
+        }
+        return await response.json();
+    },
+
+    updateRole: async (roleId: string, patch: Partial<Role>): Promise<Role> => {
+        const response = await fetch(API_ENDPOINTS.ROLES + "/" + roleId, {
+            method: "PUT",
+            headers: getHeaders(),
+            body: JSON.stringify(patch)
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Error al actualizar el rol");
         }
         return await response.json();
     },

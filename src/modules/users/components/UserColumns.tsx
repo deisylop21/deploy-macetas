@@ -2,8 +2,12 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { User } from "../lib/types";
+import { Button } from "../../core/components/ui/button";
 
-export const createUserColumns = (isDark: boolean = false): ColumnDef<User>[] => [
+export const createUserColumns = (
+    onShowDetails: (user: User) => void,
+    isDark: boolean = false
+): ColumnDef<User>[] => [
     {
         accessorKey: "name",
         header: "Nombre",
@@ -59,21 +63,37 @@ export const createUserColumns = (isDark: boolean = false): ColumnDef<User>[] =>
             const status = row.original.status;
             const isActive = status === "Active";
             return (
-                <div className={`px-2 py-1 rounded-full text-xs inline-flex items-center ${
-                    isDark
-                        ? isActive
-                            ? "bg-green-900/50 text-green-400"
-                            : "bg-red-900/50 text-red-400"
-                        : isActive
+                <div className="flex justify-left" >
+                <span
+                    className={
+                        "px-3 py-1 rounded-full font-semibold text-xs min-w-[100px] text-center " +
+                        (isActive
                             ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                }`}>
-                    <span className={`w-2 h-2 rounded-full mr-1 ${
-                        isActive ? "bg-green-500" : "bg-red-500"
-                    }`}></span>
+                            : "bg-red-100 text-red-800")
+                    }
+                >
                     {isActive ? "Activo" : "Inactivo"}
+                </span>
                 </div>
             );
         },
     },
+    {
+        id: "actions",
+        header: "Acciones",
+        cell: ({ row }) => {
+            const user = row.original;
+            return (
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onShowDetails(user)}
+                    className={`text-xs ${isDark ? "border-gray-600 text-white hover:bg-gray-700" : ""}`}
+                >
+                    Detalles
+                </Button>
+            );
+        },
+    },
 ];
+{/*HOLA aqui pausa con el contorl z*/}

@@ -73,14 +73,20 @@ export const createModuleColumns = (
         accessorKey: "is_active",
         header: "Estado",
         cell: ({ row }) => {
-            const { id, is_active } = row.original;
+            const isActive = row.original.is_active;
             return (
-                <StatusCell
-                    moduleId={id}
-                    isActive={is_active}
-                    onToggle={onToggleStatus}
-                    isDark={isDark}
-                />
+                <div className="flex justify-left" >
+                <span
+                    className={
+                        "px-3 py-1 rounded-full font-semibold text-xs min-w-[100px] text-center " +
+                        (isActive
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800")
+                    }
+                >
+                    {isActive ? "Activo" : "Inactivo"}
+                </span>
+                </div>
             );
         },
     },

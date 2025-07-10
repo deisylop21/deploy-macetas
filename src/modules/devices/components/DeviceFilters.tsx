@@ -6,11 +6,21 @@ import { Input } from "../../core/components/ui/input";
 
 interface DeviceFiltersProps {
     onSearch: (search: string) => void;
-    onSortChange: (sortBy: string, sortOrder: "asc" | "desc") => void;
+    onSortChange: (sortBy: string, sortOrder: "asc" | "desc" | "linked") => void;
     sortBy: string;
-    sortOrder: "asc" | "desc";
+    sortOrder: "asc" | "desc" | "linked";
     isDark?: boolean;
 }
+
+// Opciones de ordenamiento
+const sortOptions = [
+    { label: "Identificador (a-z)", value: "identifier-asc", sortBy: "identifier", sortOrder: "asc" },
+    { label: "Identificador (z-a)", value: "identifier-desc", sortBy: "identifier", sortOrder: "desc" },
+    { label: "Fecha de registro (antiguo-nuevo)", value: "registered_at-asc", sortBy: "registered_at", sortOrder: "asc" },
+    { label: "Fecha de registro (nuevo-antiguo)", value: "registered_at-desc", sortBy: "registered_at", sortOrder: "desc" },
+    { label: "Estado: Inactivos primero", value: "status-desc", sortBy: "status", sortOrder: "desc" },
+    { label: "Estado: Activos primero", value: "status-asc", sortBy: "status", sortOrder: "asc" }
+];
 
 export function DeviceFilters({
                                   onSearch,
@@ -30,12 +40,17 @@ export function DeviceFilters({
         onSearch(searchTerm);
     };
 
-    const handleSortByChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        onSortChange(e.target.value, sortOrder);
-    };
+    // Detecta la opción seleccionada correctamente
+    const currentSortValue =
+        sortOptions.find(opt => opt.sortBy === sortBy && opt.sortOrder === sortOrder)?.value
+        || "identifier-asc";
 
-    const handleSortOrderChange = () => {
-        onSortChange(sortBy, sortOrder === "asc" ? "desc" : "asc");
+    const handleSortByChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const value = e.target.value;
+        const found = sortOptions.find(opt => opt.value === value);
+        if (found) {
+            onSortChange(found.sortBy, found.sortOrder as "asc" | "desc" | "linked");
+        }
     };
 
     return (
@@ -62,7 +77,7 @@ export function DeviceFilters({
             <div className="flex items-center gap-2">
                 <span className={isDark ? "text-gray-300" : "text-gray-700"}>Ordenar por:</span>
                 <select
-                    value={sortBy}
+                    value={currentSortValue}
                     onChange={handleSortByChange}
                     className={`border rounded px-2 py-1.5 ${
                         isDark
@@ -70,16 +85,10 @@ export function DeviceFilters({
                             : "bg-white border-gray-300"
                     }`}
                 >
-                    <option value="identifier">Identificador</option>
-                    <option value="registered_at">Fecha de registro</option>
+                    {sortOptions.map(opt => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
                 </select>
-                <Button
-                    onClick={handleSortOrderChange}
-                    variant="ghost"
-                    className={`px-2 ${isDark ? "text-white" : ""}`}
-                >
-                    {sortOrder === "asc" ? "↑" : "↓"}
-                </Button>
             </div>
         </div>
     );

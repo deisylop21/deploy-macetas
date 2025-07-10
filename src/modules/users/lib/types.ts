@@ -1,10 +1,18 @@
+export interface Profile {
+    birthdate?: string;
+    phone?: string;
+}
+
 export interface User {
     id: string;
     name: string;
     lastname: string;
     email: string;
-    role: string;
     status: string;
+    role?: string;
+    roles?: { id: string; name: string }[];
+    status_account?: string;
+    profile?: Profile;
 }
 
 export interface Role {
@@ -23,6 +31,16 @@ export interface CreateUserDTO {
     roleId: string;
 }
 
+export interface EditUserDTO {
+    name: string;
+    lastname: string;
+    email: string;
+    birthdate: string;
+    phone: string;
+    status_account: string;
+    role_id: string;
+}
+
 export interface GetRolesResponse {
     data: Role[];
     meta: {
@@ -32,15 +50,16 @@ export interface GetRolesResponse {
         totalPages: number;
     };
 }
-{/*HOLA*/}
+
 export interface UserFilters {
     page: number;
     limit: number;
     search: string;
     sortBy: string;
     sortOrder: 'asc' | 'desc';
+    roleId?: string;
 }
-
+{/*pauusas*/}
 export interface UserResponse {
     data: User[];
     meta: {
@@ -50,3 +69,4 @@ export interface UserResponse {
         totalPages: number;
     }
 }
+{/*HOLA aqui pausa1*/}

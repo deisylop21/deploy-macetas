@@ -1,7 +1,6 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Switch } from "../../core/components/ui/switch";
 import { Role } from "../lib/types";
 import { Button } from "../../core/components/ui/button";
 import * as React from "react";
@@ -40,15 +39,17 @@ export const createRoleColumns = (
         cell: ({ row }) => {
             const isActive = row.original.is_active;
             return (
-                <div className="flex items-center">
-                    <Switch
-                        checked={isActive}
-                        disabled={true}
-                        className={isDark ? 'bg-gray-600 data-[state=checked]:bg-green-500' : ''}
-                    />
-                    <span className={`ml-2 ${isDark ? (isActive ? 'text-green-400' : 'text-gray-400') : ''}`}>
-                        {isActive ? "Activo" : "Inactivo"}
-                    </span>
+                <div className="flex justify-left">
+                <span
+                    className={
+                        "px-3 py-1 rounded-full font-semibold text-xs min-w-[100px] text-center " +
+                        (isActive
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800")
+                    }
+                >
+                    {isActive ? "Activo" : "Inactivo"}
+                </span>
                 </div>
             );
         },

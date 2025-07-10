@@ -6,7 +6,7 @@ import { Role, PermissionType, permissionLabels, Permission } from "../lib/types
 import { Module } from "../../module/lib/types";
 import { Button } from "../../core/components/ui/button";
 import { Checkbox } from "../../core/components/ui/checkbox";
-
+{/*Hola, aqui para el control z*/}
 interface RoleUpdateModalProps {
     open: boolean;
     onClose: () => void;

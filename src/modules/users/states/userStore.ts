@@ -1,21 +1,27 @@
 import { create } from 'zustand';
 import { userService } from "../services/userService";
-import { User, CreateUserDTO, Role, UserFilters } from "../lib/types";
-
+import { User, CreateUserDTO, EditUserDTO, Role, UserFilters } from "../lib/types";
+{/*pausaaa*/}
 interface UserState {
     users: User[];
     roles: Role[];
     isLoading: boolean;
     error: string | null;
     creating: boolean;
+    updating: boolean;
+    fetchingDetails: boolean;
+    userDetails: User | null;
+    filters: UserFilters;
     totalItems: number;
     totalPages: number;
-    filters: UserFilters;
 
     fetchUsers: () => Promise<void>;
     fetchRoles: () => Promise<void>;
+    fetchUserDetails: (id: string) => Promise<void>;
     createUser: (userData: CreateUserDTO) => Promise<void>;
+    updateUser: (id: string, data: EditUserDTO) => Promise<void>;
     setFilters: (filters: Partial<UserFilters>) => void;
+    clearUserDetails: () => void;
 }
 
 const initialFilters: UserFilters = {
@@ -23,7 +29,8 @@ const initialFilters: UserFilters = {
     limit: 10,
     search: '',
     sortBy: 'name',
-    sortOrder: 'asc'
+    sortOrder: 'asc',
+    roleId: '',
 };
 
 export const useUserStore = create<UserState>((set, get) => ({
@@ -32,9 +39,12 @@ export const useUserStore = create<UserState>((set, get) => ({
     isLoading: false,
     error: null,
     creating: false,
+    updating: false,
+    fetchingDetails: false,
+    userDetails: null,
+    filters: initialFilters,
     totalItems: 0,
     totalPages: 0,
-    filters: initialFilters,
 
     fetchUsers: async () => {
         set({ isLoading: true, error: null });
@@ -67,6 +77,19 @@ export const useUserStore = create<UserState>((set, get) => ({
         }
     },
 
+    fetchUserDetails: async (id: string) => {
+        set({ fetchingDetails: true, error: null });
+        try {
+            const user = await userService.getUserById(id);
+            set({ userDetails: user, fetchingDetails: false });
+        } catch (error) {
+            set({
+                fetchingDetails: false,
+                error: error instanceof Error ? error.message : "Error al obtener detalles del usuario"
+            });
+        }
+    },
+
     createUser: async (userData: CreateUserDTO) => {
         set({ creating: true, error: null });
         try {
@@ -82,10 +105,30 @@ export const useUserStore = create<UserState>((set, get) => ({
         }
     },
 
+    updateUser: async (id: string, data: EditUserDTO) => {
+        set({ updating: true, error: null });
+        try {
+            await userService.updateUser(id, data);
+            set({ updating: false });
+            await get().fetchUsers();
+        } catch (error) {
+            set({
+                updating: false,
+                error: error instanceof Error ? error.message : "Error al actualizar el usuario"
+            });
+            throw error;
+        }
+    },
+
     setFilters: (filters: Partial<UserFilters>) => {
         set(state => ({
             filters: { ...state.filters, ...filters }
         }));
         get().fetchUsers();
+    },
+
+    clearUserDetails: () => {
+        set({ userDetails: null });
     }
 }));
+{/*HOLA aqui pausa1*/}

@@ -12,6 +12,15 @@ interface RolesFiltersProps {
     isDark?: boolean;
 }
 
+const sortOptions = [
+    { label: "Nombre (a-z)", value: "name-asc", sortBy: "name", sortOrder: "asc" },
+    { label: "Nombre (z-a)", value: "name-desc", sortBy: "name", sortOrder: "desc" },
+    { label: "Fecha de creación (antiguo-nuevo)", value: "created_date-asc", sortBy: "created_date", sortOrder: "asc" },
+    { label: "Fecha de creación (nuevo-antiguo)", value: "created_date-desc", sortBy: "created_date", sortOrder: "desc" },
+    { label: "Estado: Activos primero", value: "is_active-desc", sortBy: "is_active", sortOrder: "desc" },
+    { label: "Estado: Inactivos primero", value: "is_active-asc", sortBy: "is_active", sortOrder: "asc" },
+];
+
 export function RolesFilters({
                                  onSearch,
                                  onSortChange,
@@ -30,12 +39,17 @@ export function RolesFilters({
         onSearch(searchTerm);
     };
 
-    const handleSortByChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        onSortChange(e.target.value, sortOrder);
-    };
+    // Calcula el valor select actual
+    const currentSortValue =
+        sortOptions.find(opt => opt.sortBy === sortBy && opt.sortOrder === sortOrder)?.value
+        || "name-asc";
 
-    const handleSortOrderChange = () => {
-        onSortChange(sortBy, sortOrder === "asc" ? "desc" : "asc");
+    const handleSortByChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const value = e.target.value;
+        const found = sortOptions.find(opt => opt.value === value);
+        if (found) {
+            onSortChange(found.sortBy, found.sortOrder as "asc" | "desc");
+        }
     };
 
     return (
@@ -62,7 +76,7 @@ export function RolesFilters({
             <div className="flex items-center gap-2">
                 <span className={isDark ? "text-gray-300" : "text-gray-700"}>Ordenar por:</span>
                 <select
-                    value={sortBy}
+                    value={currentSortValue}
                     onChange={handleSortByChange}
                     className={`border rounded px-2 py-1.5 ${
                         isDark
@@ -70,16 +84,10 @@ export function RolesFilters({
                             : "bg-white border-gray-300"
                     }`}
                 >
-                    <option value="name">Nombre</option>
-                    <option value="created_date">Fecha de creación</option>
+                    {sortOptions.map(opt => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
                 </select>
-                <Button
-                    onClick={handleSortOrderChange}
-                    variant="ghost"
-                    className={`px-2 ${isDark ? "text-white" : ""}`}
-                >
-                    {sortOrder === "asc" ? "↑" : "↓"}
-                </Button>
             </div>
         </div>
     );

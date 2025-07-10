@@ -3,20 +3,35 @@
 import { useState } from "react";
 import { Button } from "../../core/components/ui/button";
 import { Input } from "../../core/components/ui/input";
-
+import { Role } from "../lib/types";
+{/*HOLA o, pausaaaaaaaaa*/}
 interface UserFiltersProps {
     onSearch: (search: string) => void;
     onSortChange: (sortBy: string, sortOrder: "asc" | "desc") => void;
+    onRoleChange: (roleId: string) => void;
     sortBy: string;
     sortOrder: "asc" | "desc";
+    selectedRoleId: string;
+    roles: Role[];
     isDark?: boolean;
 }
+const sortOptions = [
+    { label: "Nombre (a-z)", value: "name-asc", sortBy: "name", sortOrder: "asc" },
+    { label: "Nombre (z-a)", value: "name-desc", sortBy: "name", sortOrder: "desc" },
+    { label: "Fecha de creación (antiguo-nuevo)", value: "created_date-asc", sortBy: "created_date", sortOrder: "asc" },
+    { label: "Fecha de creación (nuevo-antiguo)", value: "created_date-desc", sortBy: "created_date", sortOrder: "desc" },
+    { label: "Estado: Activos primero", value: "is_active-desc", sortBy: "is_active", sortOrder: "desc" },
+    { label: "Estado: Inactivos primero", value: "is_active-asc", sortBy: "is_active", sortOrder: "asc" },
+];
 
 export function UserFilters({
                                 onSearch,
                                 onSortChange,
+                                onRoleChange,
                                 sortBy,
                                 sortOrder,
+                                selectedRoleId,
+                                roles,
                                 isDark = false
                             }: UserFiltersProps) {
     const [searchTerm, setSearchTerm] = useState("");
@@ -30,14 +45,21 @@ export function UserFilters({
         onSearch(searchTerm);
     };
 
+    const currentSortValue =
+        sortOptions.find(opt => opt.sortBy === sortBy && opt.sortOrder === sortOrder)?.value
+        || "name-asc";
+
     const handleSortByChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        onSortChange(e.target.value, sortOrder);
+        const value = e.target.value;
+        const found = sortOptions.find(opt => opt.value === value);
+        if (found) {
+            onSortChange(found.sortBy, found.sortOrder as "asc" | "desc");
+        }
     };
 
-    const handleSortOrderChange = () => {
-        onSortChange(sortBy, sortOrder === "asc" ? "desc" : "asc");
+    const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        onRoleChange(e.target.value);
     };
-
     return (
         <div className="flex flex-col md:flex-row gap-4 mb-6">
             <form
@@ -62,7 +84,7 @@ export function UserFilters({
             <div className="flex items-center gap-2">
                 <span className={isDark ? "text-gray-300" : "text-gray-700"}>Ordenar por:</span>
                 <select
-                    value={sortBy}
+                    value={currentSortValue}
                     onChange={handleSortByChange}
                     className={`border rounded px-2 py-1.5 ${
                         isDark
@@ -70,15 +92,27 @@ export function UserFilters({
                             : "bg-white border-gray-300"
                     }`}
                 >
-                    <option value="name">Nombre</option>
+                    {sortOptions.map(opt => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
                 </select>
-                <Button
-                    onClick={handleSortOrderChange}
-                    variant="ghost"
-                    className={`px-2 ${isDark ? "text-white" : ""}`}
+            </div>
+            <div className="flex items-center gap-2">
+                <span className={isDark ? "text-gray-300" : "text-gray-700"}>Rol:</span>
+                <select
+                    value={selectedRoleId}
+                    onChange={handleRoleChange}
+                    className={`border rounded px-2 py-1.5 ${
+                        isDark
+                            ? "bg-gray-700 border-gray-600 text-white"
+                            : "bg-white border-gray-300"
+                    }`}
                 >
-                    {sortOrder === "asc" ? "↑" : "↓"}
-                </Button>
+                    <option value="">Todos</option>
+                    {roles.map(role => (
+                        <option key={role.id} value={role.id}>{role.name}</option>
+                    ))}
+                </select>
             </div>
         </div>
     );

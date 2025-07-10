@@ -7,7 +7,7 @@ import { Module } from "../../module/lib/types";
 function formatDate(dateStr?: string | null) {
     if (!dateStr) return "-";
     const date = new Date(dateStr);
-    return date.toLocaleString("es-MX", {
+    return date.toLocaleDateString("es-MX", {
         year: "numeric",
         month: "2-digit",
         day: "2-digit"
@@ -33,11 +33,9 @@ export function RoleDetailsModal({
                                  }: RoleDetailsModalProps) {
     if (!open || !role) return null;
 
-    // Map module_id to module name for display
     const moduleName = (module_id: string) =>
         modules.find((m) => m.id === module_id)?.name || module_id;
 
-    // Asegúrate de que permissions es siempre un array
     const permissions: Permission[] = Array.isArray(role.permissions) ? role.permissions : [];
 
     return (
@@ -45,10 +43,21 @@ export function RoleDetailsModal({
             <div className={`rounded-2xl shadow-2xl w-full max-w-lg p-6 relative ${isDark ? 'bg-gray-800 text-white' : 'bg-white text-black'}`}>
                 <h2 className="text-xl font-bold mb-4">Detalles del Rol</h2>
                 <div className="mb-4 space-y-2">
-                    <div><strong>ID:</strong> {role.id}</div>
+                    {/* <div><strong>ID:</strong> {role.id}</div>  <-- ID REMOVIDO */}
                     <div><strong>Nombre:</strong> {role.name}</div>
                     <div><strong>Descripción:</strong> {role.description}</div>
-                    <div><strong>Estado:</strong> {role.is_active ? "Activo" : "Inactivo"}</div>
+                    <div className="flex items-center gap-2">
+                        <strong>Estado:</strong>
+                        {role.is_active ? (
+                            <span className="px-3 py-1 rounded-lg bg-green-100 text-green-800 text-sm font-semibold">
+                                Activo
+                            </span>
+                        ) : (
+                            <span className="px-3 py-1 rounded-lg bg-red-100 text-red-800 text-sm font-semibold">
+                                Inactivo
+                            </span>
+                        )}
+                    </div>
                     <div><strong>Usuarios asignados:</strong> {role.user_count ?? 0}</div>
                     <div><strong>Fecha de creación:</strong> {formatDate(role.created_date)}</div>
                     <div>

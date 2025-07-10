@@ -6,44 +6,87 @@ import { DataTable } from "../../core/components/ui/data-table";
 import { createUserColumns } from "../components/UserColumns";
 import { Button } from "../../core/components/ui/button";
 import { UserCreateModal } from "../components/UserCreateModal";
+import { UserDetailsModal } from "../components/UserDetailsModal";
+import { UserEditModal } from "../components/UserEditModal";
 import { useUsers } from "../hooks/useUsers";
-import { CreateUserDTO } from "../lib/types";
+import { CreateUserDTO, EditUserDTO, User } from "../lib/types";
 import { useThemeStore } from "../../core/states/themeStore";
 import { UserFilters } from "../components/UserFilters";
 import { Pagination } from "../components/Pagination";
-
+{/*hasta aqui, pasusa*/}
 const scrollbarHideClass = "scrollbar-none";
 
 export default function UserPage() {
     const [modalOpen, setModalOpen] = useState(false);
+    const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [selectedRoleId, setSelectedRoleId] = useState("");
+
     const {
         users,
         roles,
         isLoading,
         error,
         createUser,
+        updateUser,
         creating,
+        updating,
         filters,
         totalPages,
         handleSearch,
         handleSortChange,
-        handlePageChange
+        handlePageChange,
+        fetchUserDetails,
+        userDetails,
+        fetchingDetails,
+        clearUserDetails,
+        setFilters,
     } = useUsers();
     const { mode } = useThemeStore();
     const isDark = mode === 'dark';
 
-    const columns = createUserColumns(isDark);
+    const handleRoleChange = (roleId: string) => {
+        setSelectedRoleId(roleId);
+        setFilters({
+            ...filters,
+            roleId,
+            page: 1 // reinicia la paginación al cambiar filtro
+        });
+    };
+    function handleShowDetails(user: User) {
+        setSelectedUser(user);
+        fetchUserDetails(user.id);
+        setDetailsModalOpen(true);
+    }
 
-    const activeRoles = roles.filter(role => role.is_active);
+    function handleEditClick(user: User) {
+        setSelectedUser(user);
+        setEditModalOpen(true);
+        setDetailsModalOpen(false);
+    }
 
-    const handleUserCreated = async (userData: CreateUserDTO) => {
+    async function handleUserCreated(userData: CreateUserDTO) {
         try {
             await createUser(userData);
             setModalOpen(false);
         } catch (error) {
             console.error("Error al crear usuario:", error);
         }
-    };
+    }
+
+    async function handleUserUpdated(data: EditUserDTO) {
+        if (selectedUser) {
+            try {
+                await updateUser(selectedUser.id, data);
+                setEditModalOpen(false);
+                setSelectedUser(null);
+                clearUserDetails();
+            } catch (error) {
+                console.error("Error al actualizar usuario:", error);
+            }
+        }
+    }
 
     return (
         <>
@@ -70,8 +113,11 @@ export default function UserPage() {
                             <UserFilters
                                 onSearch={handleSearch}
                                 onSortChange={handleSortChange}
+                                onRoleChange={handleRoleChange}
                                 sortBy={filters?.sortBy || "name"}
                                 sortOrder={filters?.sortOrder || "asc"}
+                                selectedRoleId={selectedRoleId}
+                                roles={roles.filter(role => role.is_active)}
                                 isDark={isDark}
                             />
                             <Button
@@ -96,7 +142,7 @@ export default function UserPage() {
                         ) : (
                             <div className={`h-full overflow-auto ${scrollbarHideClass}`}>
                                 <DataTable
-                                    columns={columns}
+                                    columns={createUserColumns(handleShowDetails, isDark)}
                                     data={users}
                                     className={isDark ? 'text-white bg-gray-800 border-gray-700' : ''}
                                 />
@@ -114,8 +160,30 @@ export default function UserPage() {
                         open={modalOpen}
                         onClose={() => setModalOpen(false)}
                         onSubmitSuccess={handleUserCreated}
-                        roles={activeRoles}
+                        roles={roles.filter(role => role.is_active)}
                         isDark={isDark}
+                    />
+
+                    <UserDetailsModal
+                        open={detailsModalOpen}
+                        user={userDetails || selectedUser || undefined}
+                        onClose={() => {
+                            setDetailsModalOpen(false);
+                            clearUserDetails();
+                        }}
+                        onEdit={handleEditClick}
+                        isDark={isDark}
+                        loading={fetchingDetails}
+                    />
+
+                    <UserEditModal
+                        open={editModalOpen}
+                        user={userDetails || selectedUser || undefined}
+                        onClose={() => setEditModalOpen(false)}
+                        onSubmitSuccess={handleUserUpdated}
+                        isDark={isDark}
+                        loading={updating}
+                        roles={roles.filter(role => role.is_active)}
                     />
                 </main>
             </div>

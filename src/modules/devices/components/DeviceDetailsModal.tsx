@@ -36,7 +36,7 @@ export function DeviceDetailsModal({
             <div className={`rounded-2xl shadow-2xl w-full max-w-md p-6 relative ${isDark ? 'bg-gray-800 text-white' : 'bg-white text-black'}`}>
                 <h2 className="text-xl font-bold mb-4">Detalles del Dispositivo</h2>
                 <div className="mb-4 space-y-2">
-                    <div><strong>ID:</strong> {device.id}</div>
+                    {/*<div><strong>ID:</strong> {device.id}</div>*/}
                     <div><strong>Identificador:</strong> {device.identifier}</div>
                     <div><strong>Estado:</strong> {device.status === "AVAILABLE" ? "Disponible" : device.status === "DISABLED" ? "Deshabilitado" : "Vinculado"}</div>
                     <div><strong>Clave de Enlace:</strong> {device.linking_key || "-"}</div>

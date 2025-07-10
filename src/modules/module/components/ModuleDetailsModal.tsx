@@ -3,7 +3,7 @@
 import { Module } from "../lib/types";
 import { Button } from "../../core/components/ui/button";
 import React from "react";
-
+{/*Hola, aqui para el control z "oki"*/}
 interface ModuleDetailsModalProps {
     open: boolean;
     module?: Module;
@@ -28,7 +28,7 @@ export function ModuleDetailsModal({
             <div className={`rounded-2xl shadow-2xl w-full max-w-md p-6 relative ${isDark ? 'bg-gray-800 text-white' : 'bg-white text-black'}`}>
                 <h2 className="text-xl font-bold mb-4">Detalles del Módulo</h2>
                 <div className="mb-4 space-y-2">
-                    <div><strong>ID:</strong> {module.id}</div>
+                    {/*<div><strong>ID:</strong> {module.id}</div>*/}
                     <div><strong>Nombre:</strong> {module.name}</div>
                     <div><strong>Descripción:</strong> {module.description}</div>
                     <div>

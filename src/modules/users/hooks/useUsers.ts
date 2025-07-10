@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useUserStore } from "../states/userStore";
-import { CreateUserDTO } from "../lib/types";
+import { CreateUserDTO, EditUserDTO } from "../lib/types";
 
 export function useUsers() {
     const {
@@ -9,15 +9,21 @@ export function useUsers() {
         isLoading,
         error,
         creating,
+        updating,
         totalItems,
         totalPages,
         filters,
+        userDetails,
+        fetchingDetails,
         fetchUsers,
         fetchRoles,
+        fetchUserDetails,
         createUser,
-        setFilters
+        updateUser,
+        setFilters,
+        clearUserDetails
     } = useUserStore();
-
+    {/*hasta aqui*/}
     useEffect(() => {
         fetchUsers();
         fetchRoles();
@@ -42,17 +48,20 @@ export function useUsers() {
         isLoading,
         error,
         creating,
+        updating,
         totalItems,
         totalPages,
         filters,
-        fetchUsers: () => {
-            fetchUsers();
-            fetchRoles();
-        },
+        userDetails,
+        fetchingDetails,
+        fetchUserDetails,
         createUser,
+        updateUser,
         handleSearch,
         handlePageChange,
         handleSortChange,
-        setFilters
+        setFilters,
+        clearUserDetails,
     };
 }
+{/*HOLA aqui pausa1*/}

@@ -13,7 +13,7 @@ import { CreateUserDTO, EditUserDTO, User } from "../lib/types";
 import { useThemeStore } from "../../core/states/themeStore";
 import { UserFilters } from "../components/UserFilters";
 import { Pagination } from "../components/Pagination";
-{/*hasta aqui, pasusa*/}
+
 const scrollbarHideClass = "scrollbar-none";
 
 export default function UserPage() {
@@ -51,7 +51,7 @@ export default function UserPage() {
         setFilters({
             ...filters,
             roleId,
-            page: 1 // reinicia la paginación al cambiar filtro
+            page: 1
         });
     };
     function handleShowDetails(user: User) {

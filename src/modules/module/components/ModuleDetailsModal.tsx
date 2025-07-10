@@ -3,7 +3,7 @@
 import { Module } from "../lib/types";
 import { Button } from "../../core/components/ui/button";
 import React from "react";
-{/*Hola, aqui para el control z "oki"*/}
+
 interface ModuleDetailsModalProps {
     open: boolean;
     module?: Module;

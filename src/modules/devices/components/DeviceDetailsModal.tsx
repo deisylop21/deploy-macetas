@@ -1,5 +1,5 @@
 "use client";
-{/*HOLA3*/}
+
 import { Device } from "../lib/types";
 import { Button } from "../../core/components/ui/button";
 

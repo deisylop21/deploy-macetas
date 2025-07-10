@@ -59,7 +59,6 @@ export interface UserFilters {
     sortOrder: 'asc' | 'desc';
     roleId?: string;
 }
-{/*pauusas*/}
 export interface UserResponse {
     data: User[];
     meta: {
@@ -69,4 +68,3 @@ export interface UserResponse {
         totalPages: number;
     }
 }
-{/*HOLA aqui pausa1*/}

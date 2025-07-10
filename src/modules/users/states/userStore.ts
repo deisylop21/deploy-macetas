@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { userService } from "../services/userService";
 import { User, CreateUserDTO, EditUserDTO, Role, UserFilters } from "../lib/types";
-{/*pausaaa*/}
+
 interface UserState {
     users: User[];
     roles: Role[];
@@ -131,4 +131,3 @@ export const useUserStore = create<UserState>((set, get) => ({
         set({ userDetails: null });
     }
 }));
-{/*HOLA aqui pausa1*/}

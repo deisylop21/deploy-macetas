@@ -67,12 +67,10 @@ export function UserEditModal({
                 <div className="px-6 py-4 border-b border-gray-700 flex-shrink-0">
                     <h2 className="text-xl font-bold">Editar Usuario</h2>
                 </div>
-                {/* Formulario scrolleable */}
                 <form
                     onSubmit={handleSubmit(onSubmit)}
                     className="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-4"
                 >
-                    {/* ...campos como antes... */}
                     <div>
                         <label className="block mb-1 font-semibold text-base">Nombre</label>
                         <input

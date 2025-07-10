@@ -102,7 +102,7 @@ export function RoleUpdateModal({
     const onSubmit = async (data: any) => {
         const formData = prepareFormData(data);
 
-        // Si no hay cambios, simplemente cierra
+
         if (Object.keys(formData).length === 0) {
             onClose();
             return;
@@ -148,7 +148,7 @@ export function RoleUpdateModal({
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-                    {/* Información básica del rol */}
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block mb-1 font-semibold text-base">Nombre</label>

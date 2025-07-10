@@ -96,4 +96,3 @@ export const createUserColumns = (
         },
     },
 ];
-{/*HOLA aqui pausa con el contorl z*/}

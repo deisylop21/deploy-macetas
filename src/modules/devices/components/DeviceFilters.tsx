@@ -12,12 +12,12 @@ interface DeviceFiltersProps {
     isDark?: boolean;
 }
 
-// Opciones de ordenamiento
+
 const sortOptions = [
-    { label: "Identificador (a-z)", value: "identifier-asc", sortBy: "identifier", sortOrder: "asc" },
-    { label: "Identificador (z-a)", value: "identifier-desc", sortBy: "identifier", sortOrder: "desc" },
-    { label: "Fecha de registro (antiguo-nuevo)", value: "registered_at-asc", sortBy: "registered_at", sortOrder: "asc" },
-    { label: "Fecha de registro (nuevo-antiguo)", value: "registered_at-desc", sortBy: "registered_at", sortOrder: "desc" },
+    { label: "Identificador (A-Z)", value: "identifier-asc", sortBy: "identifier", sortOrder: "asc" },
+    { label: "Identificador (Z-A)", value: "identifier-desc", sortBy: "identifier", sortOrder: "desc" },
+    { label: "Más antigua", value: "registered_at-asc", sortBy: "registered_at", sortOrder: "asc" },
+    { label: "Más reciente", value: "registered_at-desc", sortBy: "registered_at", sortOrder: "desc" },
     { label: "Estado: Inactivos primero", value: "status-desc", sortBy: "status", sortOrder: "desc" },
     { label: "Estado: Activos primero", value: "status-asc", sortBy: "status", sortOrder: "asc" }
 ];
@@ -40,7 +40,7 @@ export function DeviceFilters({
         onSearch(searchTerm);
     };
 
-    // Detecta la opción seleccionada correctamente
+
     const currentSortValue =
         sortOptions.find(opt => opt.sortBy === sortBy && opt.sortOrder === sortOrder)?.value
         || "identifier-asc";

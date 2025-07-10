@@ -23,7 +23,6 @@ export function UserDetailsModal({
                                  }: UserDetailsModalProps) {
     if (!open || !user) return null;
 
-    // Mostrar el nombre del rol correctamente
     const roleName = user.role || user.roles?.[0]?.name || "-";
 
     return (

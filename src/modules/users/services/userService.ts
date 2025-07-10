@@ -2,7 +2,7 @@ import { User, CreateUserDTO, EditUserDTO, Role, GetRolesResponse } from "../lib
 import { getHeaders } from "../../core/utils/UtilsFuntions";
 import { API_ENDPOINTS } from "../../core/lib/enpoints";
 import { UserFilters, UserResponse } from "../lib/types";
-{/*pausaaa*/}
+
 export const userService = {
     getAllUsers: async (filters: UserFilters): Promise<UserResponse> => {
         const { page, limit, search, sortBy, sortOrder, roleId } = filters;
@@ -67,4 +67,3 @@ export const userService = {
         return result.data || [];
     },
 };
-{/*HOLA aqui pausa con el contorl z*/}

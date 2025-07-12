@@ -20,9 +20,6 @@ import { ReactComponent as UserAdminIcon } from "../../../../../../assets/icons/
 import { ReactComponent as ManagmentModulesIcon } from "../../../../../../assets/icons/ManagmentModulesIcon.svg";
 import { ReactComponent as ManagmentRolesIcon } from "../../../../../../assets/icons/ManagmentRolesIcon.svg";
 import { ReactComponent as CatalogyPlantsIcon } from "../../../../../../assets/icons/CatalogyPlantsIcon.svg";
-import { ReactComponent as FamilyPlantsIcon } from "../../../../../../assets/icons/FamilyPlantsIcon.svg";
-import { ReactComponent as GenusPlantsIcon } from "../../../../../../assets/icons/GenusPlantsIcon.svg";
-import { ReactComponent as SpeciesPlantsIcon } from "../../../../../../assets/icons/SpeciesPlantsIcon.svg";
 import { ReactComponent as DevicesIcon } from "../../../../../../assets/icons/DevicesIcon.svg";
 
 const SIDEBAR_WIDTH = "w-64";
@@ -51,24 +48,6 @@ const Sidebar = ({ user }: SidebarProps) => {
                     label: "Catálogo",
                     icon: <CatalogyPlantsIcon className="w-5 h-5" />,
                     route: "/plants/catalog"
-                },
-                {
-                    id: "plant-family",
-                    label: "Familias",
-                    icon: <FamilyPlantsIcon className="w-5 h-5" />,
-                    route: "/plants/family"
-                },
-                {
-                    id: "plant-genus",
-                    label: "Género",
-                    icon: <GenusPlantsIcon className="w-5 h-5" />,
-                    route: "/plants/genus"
-                },
-                {
-                    id: "plant-species",
-                    label: "Especies",
-                    icon: <SpeciesPlantsIcon className="w-5 h-5" />,
-                    route: "/plants/species"
                 },
             ],
         },

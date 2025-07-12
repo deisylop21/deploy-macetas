@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { usePlantCatalogStore } from "../../states/plant-catalogy/plantCatalogStore";
-import type { CreatePlantCatalogDTO, UpdatePlantCatalogDTO, PlantCatalogFilters } from "../../lib/plant-catalogy/types";
 
 export function usePlantCatalog() {
     const {
@@ -16,9 +15,6 @@ export function usePlantCatalog() {
         totalItems,
         totalPages,
         filters,
-        plantFamilies,
-        plantGenera,
-        plantSpecies,
         uploadedImageUrls,
         fetchPlants,
         fetchPlantById,
@@ -27,36 +23,18 @@ export function usePlantCatalog() {
         deletePlant,
         uploadImages,
         setFilters,
-        loadFamilies,
-        loadGenera,
-        loadSpecies,
-        resetUploadedImages
+        resetUploadedImages,
     } = usePlantCatalogStore();
 
     useEffect(() => {
         fetchPlants();
-        loadFamilies();
-        loadGenera();
-        loadSpecies();
     }, []);
 
-    const handleSearch = (search: string) => {
-        setFilters({ search, page: 1 });
-    };
-
-    const handlePageChange = (page: number) => {
-        setFilters({ page });
-    };
-
-    const handleTypeChange = (planttype: string) => {
-        setFilters({ planttype, page: 1 });
-    };
-    const handleSortByChange = (sortBy: string) => {
-        setFilters({ sortBy, page: 1 });
-    };
-    const handleSortOrderChange = (sortOrder: "asc" | "desc") => {
-        setFilters({ sortOrder, page: 1 });
-    };
+    const handleSearch = (search: string) => setFilters({ search, page: 1 });
+    const handlePageChange = (page: number) => setFilters({ page });
+    const handleTypeChange = (planttype: string) => setFilters({ planttype, page: 1 });
+    const handleSortByChange = (sortBy: string) => setFilters({ sortBy, page: 1 });
+    const handleSortOrderChange = (sortOrder: "asc" | "desc") => setFilters({ sortOrder, page: 1 });
 
     return {
         plants,
@@ -71,9 +49,6 @@ export function usePlantCatalog() {
         updating,
         deleting,
         uploading,
-        plantFamilies,
-        plantGenera,
-        plantSpecies,
         uploadedImageUrls,
         fetchPlants,
         fetchPlantById,

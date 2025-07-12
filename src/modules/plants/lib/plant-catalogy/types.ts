@@ -1,3 +1,5 @@
+import type { TaxonomicNode } from "../taxonomy/types";
+
 export interface PlantImage {
     id: string;
     image_url: string;
@@ -10,15 +12,6 @@ export interface PlantCatalogBasic {
     image: PlantImage;
 }
 
-export interface PlantTaxonomy {
-    familyId: string;
-    genusId: string;
-    speciesId: string;
-    familyName?: string;
-    genusName?: string;
-    speciesName?: string;
-}
-
 export interface PlantCatalogDetail {
     id: string;
     name: string;
@@ -26,11 +19,13 @@ export interface PlantCatalogDetail {
     planttype: string;
     mintemp: number;
     maxtemp: number;
-    humiditylevel: string;
+    minhum: number;
+    maxhum: number;
     WARNINGS?: string;
     created_at: string;
     images: PlantImage[];
-    taxonomy?: PlantTaxonomy;
+    taxonomicAncestry: TaxonomicNode[];
+    taxonomicNodeId?: string;
 }
 
 export interface CreatePlantCatalogDTO {
@@ -39,12 +34,11 @@ export interface CreatePlantCatalogDTO {
     planttype: string;
     mintemp: number;
     maxtemp: number;
-    humiditylevel: string;
+    minhum: number;
+    maxhum: number;
     WARNINGS?: string;
-    familyId: string;
-    genusId: string;
-    speciesId: string;
     imageUrls: string[];
+    taxonomicNodeId: string;
 }
 
 export interface UpdatePlantCatalogDTO {
@@ -53,12 +47,11 @@ export interface UpdatePlantCatalogDTO {
     planttype?: string;
     mintemp?: number;
     maxtemp?: number;
-    humiditylevel?: string;
+    minhum?: number;
+    maxhum?: number;
     WARNINGS?: string;
-    familyId?: string;
-    genusId?: string;
-    speciesId?: string;
     imageUrls?: string[];
+    taxonomicNodeId?: string;
 }
 
 export interface PlantCatalogResponse {
@@ -75,6 +68,8 @@ export interface PlantCatalogFilters {
     page: number;
     search: string;
     planttype?: string;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
 }
 
 export interface ImageUploadResponse {

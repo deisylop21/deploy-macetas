@@ -5,186 +5,93 @@ import {
     PlantCatalogFilters,
     CreatePlantCatalogDTO,
     UpdatePlantCatalogDTO,
-    ImageUploadResponse
-} from "../../lib/plant-catalogy/types.ts";
-import { API_ENDPOINTS } from "../../../core/lib/enpoints.ts";
-import {getHeaders, getheadersima, getHeadersimage} from "../../../core/utils/UtilsFuntions.ts";
-import { compressImage, isFileTooLarge } from "../../utils/plant-catalogy/ImageCompressor";
+    ImageUploadResponse,
+    PlantImage
+} from "../../lib/plant-catalogy/types";
+import { API_ENDPOINTS } from "../../../core/lib/enpoints";
+import { getHeaders, getheadersima } from "../../../core/utils/UtilsFuntions";
 
 export const plantCatalogService = {
     getAllPlants: async (filters: PlantCatalogFilters): Promise<PlantCatalogResponse> => {
-        try {
-            const { page, search, planttype, sortBy, sortOrder } = filters;
-            const searchParam = search ? `&search=${search}` : '';
-            const typeParam = planttype && planttype !== "Todas las categorías" ? `&planttype=${planttype}` : '';
-            const sortByParam = sortBy ? `&sortBy=${sortBy}` : '';
-            const sortOrderParam = sortOrder ? `&sortOrder=${sortOrder}` : '';
+        const { page, search, planttype, sortBy, sortOrder } = filters;
+        const searchParam = search ? `&search=${search}` : '';
+        const typeParam = planttype && planttype !== "Todas las categorías" ? `&planttype=${planttype}` : '';
+        const sortByParam = sortBy ? `&sortBy=${sortBy}` : '';
+        const sortOrderParam = sortOrder ? `&sortOrder=${sortOrder}` : '';
 
-            const url = `${API_ENDPOINTS.CATALOG_PLANTS}?page=${page}${searchParam}${typeParam}${sortByParam}${sortOrderParam}`;
+        const url = `${API_ENDPOINTS.CATALOG_PLANTS}?page=${page}${searchParam}${typeParam}${sortByParam}${sortOrderParam}`;
 
-            const response = await fetch(url, {
-                headers: getHeaders()
-            });
-
-            if (!response.ok) {
-                throw new Error("Error al obtener el catálogo de plantas");
-            }
-
-            return await response.json();
-        } catch (error) {
-            console.error("Error en getAllPlants:", error);
-            throw error;
-        }
+        const response = await fetch(url, { headers: getHeaders() });
+        if (!response.ok) throw new Error("Error al obtener el catálogo de plantas");
+        return await response.json();
     },
 
-    getPlantById: async (id: string): Promise<PlantCatalogDetail> => {
-        try {
-            const response = await fetch(API_ENDPOINTS.CATALOG_PLANT_BY_ID(id), {
-                headers: getHeaders()
-            });
-
-            if (!response.ok) {
-                throw new Error("Error al obtener la planta");
-            }
-
-            return await response.json();
-        } catch (error) {
-            console.error("Error en getPlantById:", error);
-            throw error;
-        }
+    getPlantById: async (id: string, fulldata = false): Promise<PlantCatalogDetail> => {
+        const url = `${API_ENDPOINTS.CATALOG_PLANT_BY_ID(id)}${fulldata ? "?fulldata=true" : ""}`;
+        const response = await fetch(url, { headers: getHeaders() });
+        if (!response.ok) throw new Error("Error al obtener la planta");
+        return await response.json();
     },
 
     createPlant: async (plantData: CreatePlantCatalogDTO): Promise<PlantCatalogDetail> => {
-        try {
-            const response = await fetch(API_ENDPOINTS.CATALOG_PLANTS, {
-                method: "POST",
-                headers: getHeaders(),
-                body: JSON.stringify(plantData),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Error al crear la planta");
-            }
-
-            return await response.json();
-        } catch (error) {
-            console.error("Error en createPlant:", error);
-            throw error;
+        const response = await fetch(API_ENDPOINTS.CATALOG_PLANTS, {
+            method: "POST",
+            headers: getHeaders(),
+            body: JSON.stringify(plantData),
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Error al crear la planta");
         }
+        return await response.json();
     },
 
     updatePlant: async (id: string, plantData: UpdatePlantCatalogDTO): Promise<PlantCatalogDetail> => {
-        try {
-            const transformedData: any = { ...plantData };
-
-            if (transformedData.familyId || transformedData.genusId || transformedData.speciesId) {
-                transformedData.taxonomy = {
-                    update: {}
-                };
-
-                if (transformedData.familyId) {
-                    transformedData.taxonomy.update.family = {
-                        connect: { id: transformedData.familyId }
-                    };
-                    delete transformedData.familyId;
-                }
-
-                if (transformedData.genusId) {
-                    transformedData.taxonomy.update.genus = {
-                        connect: { id: transformedData.genusId }
-                    };
-                    delete transformedData.genusId;
-                }
-
-                if (transformedData.speciesId) {
-                    transformedData.taxonomy.update.species = {
-                        connect: { id: transformedData.speciesId }
-                    };
-                    delete transformedData.speciesId;
-                }
-            }
-
-            const response = await fetch(API_ENDPOINTS.CATALOG_PLANT_BY_ID(id), {
-                method: "PUT",
-                headers: getHeaders(),
-                body: JSON.stringify(transformedData),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Error al actualizar la planta");
-            }
-
-            return await response.json();
-        } catch (error) {
-            console.error("Error en updatePlant:", error);
-            throw error;
+        const response = await fetch(API_ENDPOINTS.CATALOG_PLANT_BY_ID(id), {
+            method: "PUT",
+            headers: getHeaders(),
+            body: JSON.stringify(plantData),
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Error al actualizar la planta");
         }
+        return await response.json();
     },
 
     deletePlant: async (id: string): Promise<void> => {
-        try {
-            const response = await fetch(API_ENDPOINTS.CATALOG_PLANT_BY_ID(id), {
-                method: "DELETE",
-                headers: getHeaders()
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Error al eliminar la planta");
-            }
-        } catch (error) {
-            console.error("Error en deletePlant:", error);
-            throw error;
+        const response = await fetch(API_ENDPOINTS.CATALOG_PLANT_BY_ID(id), {
+            method: "DELETE",
+            headers: getHeaders()
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Error al eliminar la planta");
         }
     },
 
     uploadImages: async (files: File[]): Promise<ImageUploadResponse> => {
-        try {
-            const formData = new FormData();
-
-            files.forEach(file => {
-                formData.append('images', file);
-            });
-
-            const response = await fetch(API_ENDPOINTS.PLANT_IMAGES_UPLOAD, {
-                method: "POST",
-                headers: getheadersima(),
-                body: formData
-            });
-
-            if (!response.ok) {
-                const responseText = await response.text();
-                let errorMessage = `Error ${response.status}: ${response.statusText}`;
-
-                try {
-                    const errorData = JSON.parse(responseText);
-                    errorMessage = errorData.message || errorMessage;
-                } catch (parseError) {
-                    console.error("La respuesta no es JSON:", responseText);
-                }
-
-                throw new Error(errorMessage);
-            }
-
+        const formData = new FormData();
+        files.forEach(file => formData.append('images', file));
+        const response = await fetch(API_ENDPOINTS.PLANT_IMAGES_UPLOAD, {
+            method: "POST",
+            headers: getheadersima(),
+            body: formData
+        });
+        if (!response.ok) {
+            const responseText = await response.text();
+            let errorMessage = `Error ${response.status}: ${response.statusText}`;
             try {
-                return await response.json();
-            } catch (jsonError) {
-                console.error("Error al parsear la respuesta JSON:", jsonError);
-                const text = await response.text();
-                console.log("Respuesta cruda:", text);
-
-                return {
-                    urls: [],
-                    message: "Procesado pero sin poder parsear la respuesta"
-                };
-            }
-        } catch (error) {
-            console.error("Error en uploadImages:", error);
-            throw error;
+                const errorData = JSON.parse(responseText);
+                errorMessage = errorData.message || errorMessage;
+            } catch {}
+            throw new Error(errorMessage);
         }
-
+        try {
+            return await response.json();
+        } catch {
+            return { urls: [], message: "Procesado pero sin poder parsear la respuesta" };
+        }
     },
 
     addImageToPlant: async (plantId: string, formData: FormData): Promise<PlantImage> => {
@@ -196,13 +103,22 @@ export const plantCatalogService = {
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Error al añadir imagen a la planta");
+                const errorText = await response.text();
+                console.error("❌ Error response:", errorText);
+                let errorMessage = `Error ${response.status}: ${response.statusText}`;
+                try {
+                    const errorData = JSON.parse(errorText);
+                    errorMessage = errorData.message || errorMessage;
+                } catch (e) {
+                    console.error("Error parsing error response:", e);
+                }
+                throw new Error(errorMessage);
             }
 
-            return await response.json();
+            const result = await response.json();
+            return result;
         } catch (error) {
-            console.error("Error en addImageToPlant:", error);
+            console.error("❌ Error en addImageToPlant:", error);
             throw error;
         }
     },
@@ -216,13 +132,22 @@ export const plantCatalogService = {
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Error al actualizar imagen");
+                const errorText = await response.text();
+                console.error("❌ Error response:", errorText);
+                let errorMessage = `Error ${response.status}: ${response.statusText}`;
+                try {
+                    const errorData = JSON.parse(errorText);
+                    errorMessage = errorData.message || errorMessage;
+                } catch (e) {
+                    console.error("Error parsing error response:", e);
+                }
+                throw new Error(errorMessage);
             }
 
-            return await response.json();
+            const result = await response.json();
+            return result;
         } catch (error) {
-            console.error("Error en updateImageFile:", error);
+            console.error("❌ Error en updateImageFile:", error);
             throw error;
         }
     },
@@ -235,11 +160,20 @@ export const plantCatalogService = {
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Error al eliminar imagen");
+                const errorText = await response.text();
+                console.error("❌ Error response:", errorText);
+                let errorMessage = `Error ${response.status}: ${response.statusText}`;
+                try {
+                    const errorData = JSON.parse(errorText);
+                    errorMessage = errorData.message || errorMessage;
+                } catch (e) {
+                    console.error("Error parsing error response:", e);
+                }
+                throw new Error(errorMessage);
             }
+
         } catch (error) {
-            console.error("Error en deleteImage:", error);
+            console.error("❌ Error en deleteImage:", error);
             throw error;
         }
     }

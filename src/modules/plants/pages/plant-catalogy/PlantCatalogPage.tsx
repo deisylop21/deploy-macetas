@@ -4,14 +4,14 @@ import { useState, useEffect } from "react";
 import Sidebar from "../../../core/components/layout/sidebar/pages/Sidebar";
 import { Button } from "../../../core/components/ui/button";
 import { PlantCatalogFilters } from "../../components/plant-catalogy/PlantCatalogFilters";
-import { PlantFormModal } from "../../components/plant-catalogy/PlantCatalogFormModal";
+import { PlantFormModal } from "../../components/plant-catalogy/PlantFormModal";
 import { PlantCard } from "../../components/plant-catalogy/PlantCard";
 import { PlantDetailModal } from "../../components/plant-catalogy/PlantDetailModal";
 import { DeleteConfirmationModal } from "../../components/plant-catalogy/DeleteConfirmationModal";
 import { Pagination } from "../../components/plant-catalogy/Pagination";
 import { usePlantCatalog } from "../../hooks/plant-catalogy/usePlantCatalog";
 import { useThemeStore } from "../../../core/states/themeStore";
-
+{/*HOLAAA*/}
 export default function PlantCatalogPage() {
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [editModalOpen, setEditModalOpen] = useState(false);
@@ -34,9 +34,6 @@ export default function PlantCatalogPage() {
         totalItems,
         totalPages,
         filters,
-        plantFamilies,
-        plantGenera,
-        plantSpecies,
         uploadedImageUrls,
         fetchPlants,
         fetchPlantById,
@@ -46,13 +43,10 @@ export default function PlantCatalogPage() {
         uploadImages,
         handleSearch,
         handlePageChange,
-
         handleSortByChange,
         handleSortOrderChange,
         resetUploadedImages
     } = usePlantCatalog();
-    {/*Hola*/}
-
 
     const handleAddPlant = () => {
         resetUploadedImages();
@@ -106,7 +100,6 @@ export default function PlantCatalogPage() {
                 <div className="flex items-center justify-between gap-4 px-8 mb-6">
                     <PlantCatalogFilters
                         onSearch={handleSearch}
-
                         onSortByChange={handleSortByChange}
                         onSortOrderChange={handleSortOrderChange}
                         sortBy={filters.sortBy || "name"}
@@ -167,6 +160,7 @@ export default function PlantCatalogPage() {
                         </>
                     )}
                 </div>
+
                 <style jsx>{`
                     .scrollbar-none::-webkit-scrollbar {
                         display: none;
@@ -177,21 +171,21 @@ export default function PlantCatalogPage() {
                     }
                 `}</style>
 
+                {/* Modal para crear planta */}
                 <PlantFormModal
                     open={createModalOpen}
                     onClose={() => setCreateModalOpen(false)}
                     onSubmit={handleCreateSubmit}
                     isSubmitting={creating}
+                    isLoadingDetail={isLoadingDetail}
                     uploadImages={uploadImages}
                     isUploading={uploading}
                     uploadedUrls={uploadedImageUrls}
                     resetUploadedImages={resetUploadedImages}
-                    families={plantFamilies}
-                    genera={plantGenera}
-                    species={plantSpecies}
                     isDark={isDark}
                 />
 
+                {/* Modal para editar planta */}
                 <PlantFormModal
                     open={editModalOpen}
                     onClose={() => setEditModalOpen(false)}
@@ -202,9 +196,6 @@ export default function PlantCatalogPage() {
                     uploadedUrls={uploadedImageUrls}
                     resetUploadedImages={resetUploadedImages}
                     plant={selectedPlant}
-                    families={plantFamilies}
-                    genera={plantGenera}
-                    species={plantSpecies}
                     isEdit={true}
                     isDark={isDark}
                 />
@@ -213,9 +204,6 @@ export default function PlantCatalogPage() {
                     plant={selectedPlant}
                     open={detailModalOpen}
                     onClose={() => setDetailModalOpen(false)}
-                    families={plantFamilies}
-                    genera={plantGenera}
-                    species={plantSpecies}
                     isDark={isDark}
                 />
 

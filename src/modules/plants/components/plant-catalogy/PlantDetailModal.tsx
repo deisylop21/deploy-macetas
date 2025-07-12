@@ -3,44 +3,74 @@
 import { useState } from "react";
 import { Button } from "../../../core/components/ui/button";
 import { PlantCatalogDetail } from "../../lib/plant-catalogy/types";
+import { TaxonomicRank } from "../../lib/taxonomy/types";
 
 interface PlantDetailModalProps {
     plant: PlantCatalogDetail | null;
     open: boolean;
     onClose: () => void;
-    families: any[];
-    genera: any[];
-    species: any[];
     isDark?: boolean;
+}
+
+const RANK_ORDER: TaxonomicRank[] = [
+    TaxonomicRank.DOMAIN,
+    TaxonomicRank.KINGDOM,
+    TaxonomicRank.SUBKINGDOM,
+    TaxonomicRank.DIVISION,
+    TaxonomicRank.SUBDIVISION,
+    TaxonomicRank.SUPERCLASS,
+    TaxonomicRank.CLASS,
+    TaxonomicRank.SUBCLASS,
+    TaxonomicRank.ORDER,
+    TaxonomicRank.SUBORDER,
+    TaxonomicRank.FAMILY,
+    TaxonomicRank.SUBFAMILY,
+    TaxonomicRank.TRIBE,
+    TaxonomicRank.SUBTRIBE,
+    TaxonomicRank.GENUS,
+    TaxonomicRank.SUBGENUS,
+    TaxonomicRank.SECTION,
+    TaxonomicRank.SPECIES,
+];
+
+const TAXONOMY_RANKS_ES: Record<TaxonomicRank, string> = {
+    DOMAIN: "Dominio",
+    KINGDOM: "Reino",
+    SUBKINGDOM: "Subreino",
+    DIVISION: "División",
+    SUBDIVISION: "Subdivisión",
+    SUPERCLASS: "Superclase",
+    CLASS: "Clase",
+    SUBCLASS: "Subclase",
+    ORDER: "Orden",
+    SUBORDER: "Suborden",
+    FAMILY: "Familia",
+    SUBFAMILY: "Subfamilia",
+    TRIBE: "Tribu",
+    SUBTRIBE: "Subtribu",
+    GENUS: "Género",
+    SUBGENUS: "Subgénero",
+    SECTION: "Sección",
+    SPECIES: "Especie"
+};
+
+function getTaxonName(ancestry: PlantCatalogDetail["taxonomicAncestry"], rank: TaxonomicRank) {
+    const node = ancestry?.find(t => t.rank === rank);
+    return node?.name || null;
 }
 
 export function PlantDetailModal({
                                      plant,
                                      open,
                                      onClose,
-                                     families,
-                                     genera,
-                                     species,
                                      isDark = false
                                  }: PlantDetailModalProps) {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     if (!open || !plant) return null;
 
-    const getHumidityLabel = (level: string) => {
-        const levels: { [key: string]: string } = {
-            'LOW': 'Nivel bajo (20% - 30%)',
-            'LOW_MEDIUM': 'Nivel bajo-medio (30% - 40%)',
-            'MEDIUM': 'Nivel medio (40% - 50%)',
-            'MEDIUM_HIGH': 'Nivel medio-alto (50% - 60%)',
-            'HIGH': 'Nivel alto (60% - 70%)'
-        };
-        return levels[level] || level;
-    };
-
-    const familyName = families.find(f => f.id === plant.familyId)?.name || "No especificada";
-    const genusName = genera.find(g => g.id === plant.genusId)?.name || "No especificado";
-    const speciesName = species.find(s => s.id === plant.speciesId)?.name || "No especificada";
+    const getHumidityRange = () =>
+        `${plant.minhum ?? "-"}% - ${plant.maxhum ?? "-"}%`;
 
     const nextImage = () => {
         setCurrentImageIndex((prevIndex) =>
@@ -53,6 +83,15 @@ export function PlantDetailModal({
             prevIndex === 0 ? plant.images.length - 1 : prevIndex - 1
         );
     };
+
+    const taxonomyWithData = RANK_ORDER
+        .map(rank => ({
+            rank,
+            name: getTaxonName(plant.taxonomicAncestry, rank),
+            label: TAXONOMY_RANKS_ES[rank]
+        }))
+        .filter(item => item.name !== null);
+
 
     return (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -142,7 +181,7 @@ export function PlantDetailModal({
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <span className="text-blue-500">💧</span>
-                                        <span><strong>Humedad:</strong> {getHumidityLabel(plant.humiditylevel)}</span>
+                                        <span><strong>Humedad:</strong> {getHumidityRange()}</span>
                                     </div>
                                 </div>
                             </div>
@@ -153,17 +192,57 @@ export function PlantDetailModal({
                         <h4 className="text-lg font-semibold mb-3 flex items-center gap-2">
                             🧬 Taxonomía
                         </h4>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <strong>Familia:</strong> {familyName}
+
+                        {taxonomyWithData.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                {taxonomyWithData.map((item) => (
+                                    <div
+                                        key={item.rank}
+                                        className={`p-3 rounded-md border ${
+                                            isDark
+                                                ? 'border-gray-600 bg-gray-700/50'
+                                                : 'border-gray-200 bg-gray-50'
+                                        }`}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-blue-500">🔬</span>
+                                            <div>
+                                                <strong className={isDark ? 'text-gray-300' : 'text-gray-700'}>
+                                                    {item.label}:
+                                                </strong>
+                                                <div className={`font-medium ${
+                                                    isDark ? 'text-white' : 'text-gray-900'
+                                                }`}>
+                                                    {item.name}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                            <div>
-                                <strong>Género:</strong> {genusName}
+                        ) : (
+                            <p className={`text-sm italic ${
+                                isDark ? 'text-gray-400' : 'text-gray-600'
+                            }`}>
+                                No hay información taxonómica disponible para esta planta.
+                            </p>
+                        )}
+
+                        {taxonomyWithData.length > 0 && (
+                            <div className={`mt-4 p-3 rounded-md text-sm ${
+                                isDark
+                                    ? 'bg-blue-900/20 text-blue-300 border border-blue-700'
+                                    : 'bg-blue-50 text-blue-700 border border-blue-200'
+                            }`}>
+                                <div className="flex items-center gap-2 mb-1">
+                                    <span>ℹ️</span>
+                                    <strong>Clasificación taxonómica completa</strong>
+                                </div>
+                                <div className="text-xs">
+                                    Mostrando {taxonomyWithData.length} de {RANK_ORDER.length} niveles taxonómicos disponibles
+                                </div>
                             </div>
-                            <div>
-                                <strong>Especie:</strong> {speciesName}
-                            </div>
-                        </div>
+                        )}
                     </div>
 
                     <div>

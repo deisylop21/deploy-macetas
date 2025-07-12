@@ -1,8 +1,5 @@
 import { create } from 'zustand';
 import { plantCatalogService } from "../../services/plant-catalogy/plantCatalogService";
-import { plantFamilyService } from "../../services/plant-family/plantFamilyService"; // Asumimos que tienes estos servicios
-import { plantGenusService } from "../../services/plant-genus/plantGenusService";
-import { plantSpeciesService } from "../../services/plant-species/plantSpeciesService";
 import type {
     PlantCatalogBasic,
     PlantCatalogDetail,
@@ -10,9 +7,6 @@ import type {
     CreatePlantCatalogDTO,
     UpdatePlantCatalogDTO
 } from "../../lib/plant-catalogy/types";
-import type { PlantFamily } from "../../lib/plant-family/types";
-import type { PlantGenus } from "../../lib/plant-genus/types";
-import type { PlantSpecies } from "../../lib/plant-species/types";
 
 interface PlantCatalogState {
     plants: PlantCatalogBasic[];
@@ -20,17 +14,16 @@ interface PlantCatalogState {
     isLoading: boolean;
     isLoadingDetail: boolean;
     error: string | null;
+
     creating: boolean;
     updating: boolean;
     deleting: boolean;
     uploading: boolean;
+
     totalItems: number;
     totalPages: number;
     filters: PlantCatalogFilters;
 
-    plantFamilies: PlantFamily[];
-    plantGenera: PlantGenus[];
-    plantSpecies: PlantSpecies[];
     uploadedImageUrls: string[];
 
     fetchPlants: () => Promise<void>;
@@ -40,10 +33,6 @@ interface PlantCatalogState {
     deletePlant: (id: string) => Promise<void>;
     uploadImages: (files: File[]) => Promise<void>;
     setFilters: (filters: Partial<PlantCatalogFilters>) => void;
-
-    loadFamilies: () => Promise<void>;
-    loadGenera: () => Promise<void>;
-    loadSpecies: () => Promise<void>;
     resetUploadedImages: () => void;
 }
 
@@ -66,10 +55,6 @@ export const usePlantCatalogStore = create<PlantCatalogState>((set, get) => ({
     totalItems: 0,
     totalPages: 0,
     filters: initialFilters,
-
-    plantFamilies: [],
-    plantGenera: [],
-    plantSpecies: [],
     uploadedImageUrls: [],
 
     fetchPlants: async () => {
@@ -93,14 +78,7 @@ export const usePlantCatalogStore = create<PlantCatalogState>((set, get) => ({
     fetchPlantById: async (id: string) => {
         set({ isLoadingDetail: true, error: null });
         try {
-            const plant = await plantCatalogService.getPlantById(id);
-
-            if (plant.taxonomy) {
-                plant.familyId = plant.taxonomy.familyId;
-                plant.genusId = plant.taxonomy.genusId;
-                plant.speciesId = plant.taxonomy.speciesId;
-            }
-
+            const plant = await plantCatalogService.getPlantById(id, true); // fulldata=true para taxonomía
             set({ selectedPlant: plant, isLoadingDetail: false });
         } catch (error) {
             set({
@@ -134,7 +112,6 @@ export const usePlantCatalogStore = create<PlantCatalogState>((set, get) => ({
                 selectedPlant: updatedPlant,
                 uploadedImageUrls: []
             });
-
             get().fetchPlants();
         } catch (error) {
             set({
@@ -171,7 +148,7 @@ export const usePlantCatalogStore = create<PlantCatalogState>((set, get) => ({
             const response = await plantCatalogService.uploadImages(files);
             set({
                 uploading: false,
-                uploadedImageUrls: [...get().uploadedImageUrls, ...response.urls].slice(0, 5) // Máximo 5 imágenes
+                uploadedImageUrls: [...get().uploadedImageUrls, ...response.urls].slice(0, 5)
             });
         } catch (error) {
             set({
@@ -187,33 +164,6 @@ export const usePlantCatalogStore = create<PlantCatalogState>((set, get) => ({
             filters: { ...state.filters, ...filters }
         }));
         get().fetchPlants();
-    },
-
-    loadFamilies: async () => {
-        try {
-            const families = await plantFamilyService.getPlantFamilies({ page: 1, limit: 100, search: '', sortBy: 'name', sortOrder: 'asc' });
-            set({ plantFamilies: families.data });
-        } catch (error) {
-            console.error("Error al cargar familias:", error);
-        }
-    },
-
-    loadGenera: async () => {
-        try {
-            const genera = await plantGenusService.getPlantGenera({ page: 1, limit: 100, search: '', sortBy: 'name', sortOrder: 'asc' });
-            set({ plantGenera: genera.data });
-        } catch (error) {
-            console.error("Error al cargar géneros:", error);
-        }
-    },
-
-    loadSpecies: async () => {
-        try {
-            const species = await plantSpeciesService.getPlantSpecies({ page: 1, limit: 100, search: '', sortBy: 'name', sortOrder: 'asc' });
-            set({ plantSpecies: species.data });
-        } catch (error) {
-            console.error("Error al cargar especies:", error);
-        }
     },
 
     resetUploadedImages: () => {

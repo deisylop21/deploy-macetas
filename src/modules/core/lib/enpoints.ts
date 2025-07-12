@@ -6,12 +6,6 @@ export const API_ENDPOINTS = {
     MODULE: "https://artistic-victory-env2.up.railway.app/modules",
     MODULE_BY_ID: (id: string) => `https://artistic-victory-env2.up.railway.app/modules/${id}`,
     ADMIN_USERS: "https://artistic-victory-env2.up.railway.app/admin-management/users",
-    PLANT_FAMILIES: "https://artistic-victory-env2.up.railway.app/plant-families",
-    PLANT_FAMILY_BY_ID: (id: string) => `https://artistic-victory-env2.up.railway.app/plant-families/${id}`,
-    PLANT_GENUS_BY_ID: (id: string) => `https://artistic-victory-env2.up.railway.app/plant-genera/${id}`,
-    PLANT_GENERA: `https://artistic-victory-env2.up.railway.app/plant-genera`,
-    PLANT_SPECIES_BY_ID: (id: string) => `https://artistic-victory-env2.up.railway.app/plant-species/${id}`,
-    PLANT_SPECIES: `https://artistic-victory-env2.up.railway.app/plant-species`,
     CATALOG_PLANTS: "https://artistic-victory-env2.up.railway.app/catalog-plants",
     CATALOG_PLANT_BY_ID: (id: string) => `https://artistic-victory-env2.up.railway.app/catalog-plants/${id}`,
     PLANT_IMAGES_UPLOAD: "https://artistic-victory-env2.up.railway.app/plant-images/upload",
@@ -21,4 +15,5 @@ export const API_ENDPOINTS = {
     ADMIN_DEVICES: "https://artistic-victory-env2.up.railway.app/admin/devices",
     ADMIN_DEVICE_BY_ID: (id: string) => `https://artistic-victory-env2.up.railway.app/admin/devices/${id}`,
     ADMIN_DEVICE_REGENERATE_KEY: (id: string) => `https://artistic-victory-env2.up.railway.app/admin/devices/${id}/regenerate-key`,
+    TAXONOMY: "https://artistic-victory-env2.up.railway.app/taxonomy"
 };

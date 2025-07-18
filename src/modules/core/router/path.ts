@@ -7,5 +7,6 @@ export const ROUTES = {
         USERS_ADMIN: "/admin-management/users",
         MODULES: "/modules",
         USER_ROLE: "/roles",
-        DEVICES: "/devices"
+        DEVICES: "/devices",
+        USERS_GENERAL_ADMIN: "/users-general-management",
 };

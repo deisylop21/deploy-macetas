@@ -43,9 +43,15 @@ export const taxonomyService = {
             headers: getHeaders(),
         });
         if (!response.ok) throw new Error('Error al eliminar taxonomía');
-        return await response.json();
+        const text = await response.text();
+        if (text) {
+            try {
+                return JSON.parse(text);
+            } catch {
+
+                return;
+            }
+        }
+        return;
     }
 };
-
-
-{/*EST ES UNA PAUSA PARA PONER EL CONTROL Z*/}

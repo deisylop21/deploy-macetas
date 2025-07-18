@@ -68,14 +68,10 @@ export function PlantTaxonomySection({
 
     const handleDeleteSuccess = async () => {
         const { idx } = deleteModal;
-
         for (let i = idx; i < taxonomyChain.length; i++) {
             await onTaxonomyChange(i, null);
+            await onReloadOptions(i, i > 0 ? taxonomyChain[i - 1]?.id : undefined);
         }
-
-        const parentId = idx > 0 ? taxonomyChain[idx - 1]?.id : undefined;
-        await onReloadOptions(idx, parentId);
-
         setDeleteModal({ open: false, node: null, idx: -1 });
     };
 
@@ -85,22 +81,19 @@ export function PlantTaxonomySection({
                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                     🧬 Taxonomía
                 </h3>
-
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {RANK_ORDER.map((rank, idx) => {
                         const prevSelected = idx === 0 || taxonomyChain[idx - 1];
                         if (!prevSelected) return null;
-
                         const selectedNode = taxonomyChain[idx];
-
                         return (
                             <div key={rank}>
                                 <label className="block text-sm font-medium mb-1 capitalize">
                                     {TAXONOMY_RANKS_ES[rank] || rank}
                                 </label>
-
                                 <div className="flex gap-2 items-center">
                                     <select
+                                        key={taxonomyOptions[idx]?.map(opt => opt.id).join('-')}
                                         value={selectedNode?.id ?? ""}
                                         onChange={async (e) => {
                                             const val = e.target.value;
@@ -111,9 +104,7 @@ export function PlantTaxonomySection({
                                                 await onTaxonomyChange(idx, node);
                                             }
                                         }}
-                                        className={`flex-1 h-9 px-3 rounded-md border ${
-                                            isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
-                                        }`}
+                                        className={`flex-1 h-9 px-3 rounded-md border ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
                                         disabled={taxonomyLoading[idx] || (idx > 0 && !taxonomyChain[idx - 1])}
                                     >
                                         <option value="">Seleccionar</option>
@@ -122,7 +113,6 @@ export function PlantTaxonomySection({
                                             <option key={opt.id} value={opt.id}>{opt.name}</option>
                                         ))}
                                     </select>
-
                                     {selectedNode && (
                                         <div className="flex gap-1">
                                             <Button
@@ -131,9 +121,7 @@ export function PlantTaxonomySection({
                                                 variant="outline"
                                                 onClick={() => setEditModal({ open: true, node: selectedNode, idx })}
                                                 disabled={taxonomyLoading[idx]}
-                                                className={`w-8 h-8 p-0 text-xs ${
-                                                    isDark ? 'bg-blue-700 hover:bg-blue-600 text-white border-blue-600' : 'bg-blue-500 hover:bg-blue-600 text-white border-blue-500'
-                                                }`}
+                                                className={`w-8 h-8 p-0 text-xs ${isDark ? 'bg-blue-700 hover:bg-blue-600 text-white border-blue-600' : 'bg-blue-500 hover:bg-blue-600 text-white border-blue-500'}`}
                                                 title="Editar"
                                             >
                                                 ✏️
@@ -151,7 +139,6 @@ export function PlantTaxonomySection({
                                             </Button>
                                         </div>
                                     )}
-
                                     {taxonomyLoading[idx] && (
                                         <span className="text-xs">Cargando...</span>
                                     )}
@@ -161,7 +148,6 @@ export function PlantTaxonomySection({
                     })}
                 </div>
             </div>
-
             <TaxonomyEditModal
                 open={editModal.open}
                 node={editModal.node}
@@ -169,7 +155,6 @@ export function PlantTaxonomySection({
                 onSuccess={handleEditSuccess}
                 isDark={isDark}
             />
-
             <TaxonomyDeleteModal
                 open={deleteModal.open}
                 node={deleteModal.node}

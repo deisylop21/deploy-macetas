@@ -149,7 +149,6 @@ export function TaxonomyDeleteModal({
                     </p>
                     <div className={`p-3 rounded-md ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>
                         <p className="font-medium">{node.name}</p>
-                        <p className="text-sm opacity-70">ID: {node.id}</p>
                         <p className="text-sm opacity-70">Rango: {node.rank}</p>
                     </div>
                     <p className="text-sm mt-3 text-red-600">

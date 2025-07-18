@@ -215,7 +215,7 @@ export function PlantDetailModal({
                                                 }`}>
                                                     {item.name}
                                                 </div>
-                                            </div>
+                                               </div>
                                         </div>
                                     </div>
                                 ))}

@@ -67,7 +67,7 @@ const Sidebar = ({ user }: SidebarProps) => {
             icon: <UserIcon className="w-6 h-6" />,
             label: "Gestión de usuarios",
             subItems: [
-                { id: "user-general", label: "General", icon: <UserGeneralIcon className="w-5 h-5" /> },
+                { id: "user-general", label: "General", icon: <UserGeneralIcon className="w-5 h-5" />, route: "/users-general-management" },
                 ...(userTypeFromStore === "superadmin"
                     ? [
                         {

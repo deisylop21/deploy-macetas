@@ -54,7 +54,7 @@ export function DeviceDetailsModal({
             setSocket(null);
         }
 
-        const s = io("ws://artistic-victory-env2.up.railway.app/device-readings", {
+        const s = io("wss://artistic-victory-env2.up.railway.app/device-readings", {
             transports: ["websocket"],
             auth: { token }
         });

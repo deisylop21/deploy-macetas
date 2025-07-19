@@ -12,10 +12,18 @@ const Navbar = () => {
     const isDark = mode === 'dark';
     const { user: authUser } = useAuthStore();
 
+    const avatarUrl =
+        authUser?.profile?.profile_picture && authUser?.profile?.profile_picture.startsWith('http')
+            ? authUser.profile.profile_picture
+            : authUser?.picture && authUser?.picture.startsWith('http')
+                ? authUser.picture
+                : "https://static.vecteezy.com/system/resources/previews/005/129/844/non_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg";
+
     const currentUser = {
         name: authUser?.name || "Usuario",
-        avatarUrl: authUser?.picture || "https://static.vecteezy.com/system/resources/previews/005/129/844/non_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg",
+        avatarUrl,
     };
+
 
     return (
         <header className={`fixed top-0 left-0 w-full h-16 flex items-center justify-between px-4 shadow z-50 ${isDark ? "bg-green-800" : "bg-green-600"}`}>

@@ -49,19 +49,9 @@ export function useImageManager({ existingImages, setExistingImages, plantId }: 
 
             const updatedImage = await plantCatalogService.updateImageFile(id, formDataImage);
 
-            const cacheBreaker = `?t=${Date.now()}`;
-            const newImage = {
-                ...response,
-                image_url: `${response.image_url}${cacheBreaker}`,
-            };
+            const updatedPlant = await plantCatalogService.getPlantById(plantId, true);
 
-            setExistingImages(prev => prev.map(img =>
-                img.id === id ? {
-                    ...img,
-                    ...updatedImage,
-                    image_url: (updatedImage.image_url || img.image_url) + cacheBreaker
-                } : img
-            ));
+            setExistingImages(updatedPlant.images || []);
 
             setSelectedImage(null);
             const fileInput = document.getElementById('updateImageInput') as HTMLInputElement;
@@ -95,21 +85,11 @@ export function useImageManager({ existingImages, setExistingImages, plantId }: 
             const formDataImage = new FormData();
             formDataImage.append('image', imageToAddToPlant);
 
-            const response = await plantCatalogService.addImageToPlant(plantId, formDataImage);
+            await plantCatalogService.addImageToPlant(plantId, formDataImage);
 
-            const cacheBreaker = `?t=${Date.now()}`;
-            const newImage = {
-                ...response,
-                image_url: `${response.image_url}${cacheBreaker}`,
-            };
+            const updatedPlant = await plantCatalogService.getPlantById(plantId, true);
 
-            setExistingImages(prev => [
-                ...prev,
-                {
-                    ...response,
-                    image_url: response.image_url + cacheBreaker
-                }
-            ]);
+            setExistingImages(updatedPlant.images || []);
 
             setImageToAddToPlant(null);
             const fileInput = document.getElementById('addImageInput') as HTMLInputElement;

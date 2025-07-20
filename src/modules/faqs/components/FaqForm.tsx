@@ -42,7 +42,8 @@ export const FaqForm: React.FC<FaqFormProps> = ({
             } else {
                 setText('');
                 setImages([]);
-                setType(parentFaq ? (parentFaq.type === 'pregunta' ? 'respuesta' : 'pregunta') : defaultType);
+                // REGLA: Si es hijo, usar tipo automático. Si es principal, SIEMPRE pregunta
+                setType(parentFaq ? (parentFaq.type === 'pregunta' ? 'respuesta' : 'pregunta') : 'pregunta');
             }
         }
     }, [editingFaq, parentFaq, defaultType, isOpen]);
@@ -113,7 +114,7 @@ export const FaqForm: React.FC<FaqFormProps> = ({
     const handleClose = () => {
         setText('');
         setImages([]);
-        setType(defaultType);
+        setType('pregunta'); // Reset siempre a pregunta
         setShowDeleteImageModal(false);
         setImageToDelete(null);
         onClose();
@@ -122,6 +123,11 @@ export const FaqForm: React.FC<FaqFormProps> = ({
     if (!isOpen) return null;
 
     const isDark = mode === 'dark';
+
+    // Determinar si debe mostrar selector o solo info
+    const isEditing = !!editingFaq;
+    const isChild = !!parentFaq;
+    const showTypeSelector = !isEditing && !isChild; // Solo si es NUEVO y NO es hijo
 
     return (
         <>
@@ -149,8 +155,9 @@ export const FaqForm: React.FC<FaqFormProps> = ({
 
                     {/* Form */}
                     <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                        {/* Tipo (solo si no es hijo) */}
-                        {!parentFaq && (
+
+                        {/* SELECTOR DE TIPO - Solo para FAQ principales nuevos */}
+                        {showTypeSelector && (
                             <div>
                                 <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>
                                     Tipo de FAQ
@@ -159,23 +166,46 @@ export const FaqForm: React.FC<FaqFormProps> = ({
                                     value={type}
                                     onChange={(e) => setType(e.target.value as FaqType)}
                                     className={`w-full p-2 border rounded focus:ring-2 focus:ring-green-500 ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
-                                    disabled={!!parentFaq}
                                 >
                                     <option value="pregunta">Pregunta</option>
-                                    <option value="respuesta">Respuesta</option>
+                                    {/* ELIMINADO: <option value="respuesta">Respuesta</option> */}
+                                    {/* Las respuestas solo se crean como hijos de preguntas */}
                                 </select>
+                                <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                                    Los FAQs principales siempre comienzan como preguntas
+                                </p>
                             </div>
                         )}
 
-                        {/* Información automática del tipo */}
-                        {parentFaq && (
-                            <div className={`p-3 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                                <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-                                    <span className="font-medium">Tipo:</span> {type}
-                                    <span className="ml-2 text-xs">
-                    (automático - {parentFaq.type} genera {type})
-                  </span>
-                                </p>
+                        {/* INFORMACIÓN DEL TIPO - Para edición o hijos */}
+                        {(isEditing || isChild) && (
+                            <div>
+                                <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>
+                                    Tipo de FAQ
+                                </label>
+                                <div className={`p-3 rounded border ${isDark ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'}`}>
+                                    <div className="flex items-center gap-2">
+                    <span className="text-lg">
+                      {type === 'pregunta' ? '❓' : '✅'}
+                    </span>
+                                        <span className={`font-medium ${isDark ? 'text-white' : 'text-gray-800'}`}>
+                      {type.charAt(0).toUpperCase() + type.slice(1)}
+                    </span>
+                                        <span className={`text-xs px-2 py-1 rounded ${isDark ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-600'}`}>
+                      {isEditing ? 'No editable' : 'Automático'}
+                    </span>
+                                    </div>
+                                    {isChild && (
+                                        <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                                            Tipo determinado automáticamente: {parentFaq?.type} → {type}
+                                        </p>
+                                    )}
+                                    {isEditing && (
+                                        <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                                            El tipo no se puede cambiar durante la edición
+                                        </p>
+                                    )}
+                                </div>
                             </div>
                         )}
 
@@ -192,6 +222,9 @@ export const FaqForm: React.FC<FaqFormProps> = ({
                                 placeholder={`Escribe el contenido de la ${type} aquí...`}
                                 required
                             />
+                            <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                                Mínimo 5 caracteres requeridos
+                            </p>
                         </div>
 
                         {/* Gestión de imágenes */}
@@ -240,6 +273,9 @@ export const FaqForm: React.FC<FaqFormProps> = ({
                                     disabled={uploading}
                                     className={`w-full p-2 border rounded ${isDark ? 'bg-gray-700 border-gray-600 text-white file:bg-gray-600 file:text-white' : 'bg-white border-gray-300 file:bg-gray-50'} file:border-0 file:px-3 file:py-1 file:rounded file:text-sm file:font-medium`}
                                 />
+                                <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                                    Formatos soportados: JPEG, PNG, GIF, WEBP. Máximo 5MB por imagen.
+                                </p>
                                 {uploading && (
                                     <div className="flex items-center gap-2 text-blue-500">
                                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PlantImage } from "../../lib/plant-catalogy/types";
+import {type PlantCatalogFilters, PlantImage} from "../../lib/plant-catalogy/types";
 import { plantCatalogService } from "../../services/plant-catalogy/plantCatalogService";
 
 interface UseImageManagerProps {
@@ -112,6 +112,11 @@ export function useImageManager({ existingImages, setExistingImages, plantId }: 
         try {
             await plantCatalogService.deleteImage(imageId);
             const updatedPlant = await plantCatalogService.getPlantById(plantId, true);
+            await plantCatalogService.getAllPlants({
+                page: 1,
+                search: '',
+                planttype: 'Todas las categorías'
+            });
 
             setExistingImages(updatedPlant.images || []);
             alert("Imagen eliminada correctamente");

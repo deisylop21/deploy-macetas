@@ -111,7 +111,7 @@ const FaqsPage: React.FC = () => {
         <div className={mode === "dark" ? "dark bg-[#151E2A] min-h-screen" : "bg-white min-h-screen"}>
             <div className="p-6">
                 <div className={`max-w-5xl mx-auto rounded-lg shadow-lg ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
-                    {/* Header */}
+                    {/* Header - SIN BOTÓN "Nuevo FAQ" */}
                     <div className={`flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
                         <div>
                             <h1 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
@@ -131,58 +131,6 @@ const FaqsPage: React.FC = () => {
                                 <span className={loading ? 'animate-spin' : ''}>🔄</span>
                                 Actualizar
                             </button>
-                            <button
-                                onClick={handleNewFaq}
-                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors flex items-center gap-2"
-                            >
-                                <span>➕</span>
-                                Nuevo FAQ
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Estadísticas */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-6 border-b border-gray-200 dark:border-gray-700">
-                        <div className={`p-4 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                                        Total FAQs
-                                    </p>
-                                    <p className={`text-2xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                                        {faqs.length}
-                                    </p>
-                                </div>
-                                <span className="text-2xl">📋</span>
-                            </div>
-                        </div>
-
-                        <div className={`p-4 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                                        Preguntas
-                                    </p>
-                                    <p className={`text-2xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                                        {faqs.filter(f => f.type === 'pregunta').length}
-                                    </p>
-                                </div>
-                                <span className="text-2xl">❓</span>
-                            </div>
-                        </div>
-
-                        <div className={`p-4 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                                        Respuestas
-                                    </p>
-                                    <p className={`text-2xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                                        {faqs.filter(f => f.type === 'respuesta').length}
-                                    </p>
-                                </div>
-                                <span className="text-2xl">✅</span>
-                            </div>
                         </div>
                     </div>
 

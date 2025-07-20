@@ -123,7 +123,7 @@ export async function uploadImage(file: File): Promise<string[]> {
     console.log('Uploading image:', file.name, file.type, file.size);
 
     const formData = new FormData();
-    formData.append('images', file);
+    formData.append('file', file);
 
     const response = await fetch(API_ENDPOINTS.FAQS_IMAGES_UPLOAD, {
         method: 'POST',
@@ -162,3 +162,5 @@ export async function deleteImage(url: string): Promise<void> {
 
     console.log('Image deleted:', url);
 }
+
+{/*Hola hasta aqui el control z*/}

@@ -111,8 +111,9 @@ export function useImageManager({ existingImages, setExistingImages, plantId }: 
 
         try {
             await plantCatalogService.deleteImage(imageId);
+            const updatedPlant = await plantCatalogService.getPlantById(plantId, true);
 
-            setExistingImages(prev => prev.filter(img => img.id !== imageId));
+            setExistingImages(updatedPlant.images || []);
             alert("Imagen eliminada correctamente");
 
         } catch (error) {

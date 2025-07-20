@@ -5,9 +5,10 @@ import { plantCatalogService } from "../../services/plant-catalogy/plantCatalogS
 interface UseImageManagerProps {
     existingImages: PlantImage[];
     setExistingImages: (images: PlantImage[] | ((prev: PlantImage[]) => PlantImage[])) => void;
+    fetchPlants?: () => void;
     plantId?: string;
 }
-export function useImageManager({ existingImages, setExistingImages, plantId }: UseImageManagerProps) {
+export function useImageManager({ existingImages, setExistingImages, plantId, fetchPlants }: UseImageManagerProps) {
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [imageToAddToPlant, setImageToAddToPlant] = useState<File | null>(null);
     const [processingImageAction, setProcessingImageAction] = useState<string | null>(null);
@@ -112,13 +113,10 @@ export function useImageManager({ existingImages, setExistingImages, plantId }: 
         try {
             await plantCatalogService.deleteImage(imageId);
             const updatedPlant = await plantCatalogService.getPlantById(plantId, true);
-            await plantCatalogService.getAllPlants({
-                page: 1,
-                search: '',
-                planttype: 'Todas las categorías'
-            });
 
             setExistingImages(updatedPlant.images || []);
+
+            if (fetchPlants) fetchPlants();
             alert("Imagen eliminada correctamente");
 
         } catch (error) {

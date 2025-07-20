@@ -4,6 +4,7 @@ import { Button } from "../../../core/components/ui/button";
 import { PlantImage } from "../../lib/plant-catalogy/types";
 import { useImageManager } from "../../hooks/plant-catalogy/useImageManager";
 import { ImageUploadSection } from "./ImageUploadSection";
+import { usePlantCatalogStore } from "../../states/plant-catalogy/plantCatalogStore";
 
 interface PlantImageManagerProps {
     isEdit: boolean;
@@ -26,6 +27,9 @@ export function PlantImageManager({
                                       isUploading,
                                       isDark = false
                                   }: PlantImageManagerProps) {
+
+    const fetchPlants = usePlantCatalogStore(state => state.fetchPlants);
+
     const {
         selectedImage,
         imageToAddToPlant,
@@ -42,7 +46,12 @@ export function PlantImageManager({
         setShowImageDeleteConfirm,
         setShowImageUpdateConfirm,
         setShowImageAddConfirm,
-    } = useImageManager({ existingImages, setExistingImages, plantId });
+    } = useImageManager({
+        existingImages,
+        setExistingImages,
+        plantId,
+        fetchPlants
+    });
 
     if (isEdit) {
         return (

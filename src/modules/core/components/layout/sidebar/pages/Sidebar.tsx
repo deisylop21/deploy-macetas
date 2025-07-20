@@ -10,9 +10,6 @@ import { MenuItem, SidebarProps } from "../lib/types.ts";
 import { ReactComponent as StatsIcon } from "../../../../../../assets/icons/StatsIcon.svg";
 import { ReactComponent as PlantIcon } from "../../../../../../assets/icons/PlantIcon.svg";
 import { ReactComponent as FaqIcon } from "../../../../../../assets/icons/FaqIcon.svg";
-import { ReactComponent as UserReportsIcon } from "../../../../../../assets/icons/UserReportsIcon.svg";
-import { ReactComponent as PersonalReportsIcon } from "../../../../../../assets/icons/PersonalReportsIcon.svg";
-import { ReactComponent as ReportsAttendedIcon } from "../../../../../../assets/icons/ReportsAttendedIcon.svg";
 import { ReactComponent as FaqIcon2 } from "../../../../../../assets/icons/FaqIcon2.svg";
 import { ReactComponent as UserIcon } from "../../../../../../assets/icons/UserIcon.svg";
 import { ReactComponent as UserGeneralIcon } from "../../../../../../assets/icons/UserGeneralIcon.svg";
@@ -107,9 +104,6 @@ const Sidebar = ({ user }: SidebarProps) => {
             icon: <FaqIcon className="w-6 h-6" />,
             label: "FAQ",
             subItems: [
-                { id: "user-reports", label: "Reportes de usuario", icon: <UserReportsIcon className="w-5 h-5" /> },
-                { id: "plant-reports", label: "Reportes de personal", icon: <PersonalReportsIcon className="w-5 h-5" /> },
-                { id: "resolved-reports", label: "Reportes atendidos", icon: <ReportsAttendedIcon className="w-5 h-5" /> },
                 { id: "faq-program", label: "Programación de FAQ", icon: <FaqIcon2 className="w-5 h-5" />, route: "/faqs" }, //HOLA
             ],
         },

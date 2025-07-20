@@ -123,7 +123,7 @@ export async function uploadImage(file: File): Promise<string[]> {
     console.log('Uploading image:', file.name, file.type, file.size);
 
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('files', file);//aquí
 
     const response = await fetch(API_ENDPOINTS.FAQS_IMAGES_UPLOAD, {
         method: 'POST',

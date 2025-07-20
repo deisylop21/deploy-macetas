@@ -4,6 +4,7 @@ export { default as FaqsPage } from './pages/FaqsPage';
 // Components
 export { FaqItem } from './components/FaqItem';
 export { FaqForm } from './components/FaqForm';
+export { ConfirmModal } from './components/ConfirmModal'; //AQUí
 
 // Hooks
 export { useFaqs } from './hooks/useFaqs';

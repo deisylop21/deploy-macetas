@@ -50,6 +50,10 @@ export function useImageManager({ existingImages, setExistingImages, plantId }: 
             const updatedImage = await plantCatalogService.updateImageFile(id, formDataImage);
 
             const cacheBreaker = `?t=${Date.now()}`;
+            const newImage = {
+                ...response,
+                image_url: `${response.image_url}${cacheBreaker}`,
+            };
 
             setExistingImages(prev => prev.map(img =>
                 img.id === id ? {
@@ -94,6 +98,10 @@ export function useImageManager({ existingImages, setExistingImages, plantId }: 
             const response = await plantCatalogService.addImageToPlant(plantId, formDataImage);
 
             const cacheBreaker = `?t=${Date.now()}`;
+            const newImage = {
+                ...response,
+                image_url: `${response.image_url}${cacheBreaker}`,
+            };
 
             setExistingImages(prev => [
                 ...prev,

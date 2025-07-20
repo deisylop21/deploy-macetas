@@ -13,6 +13,7 @@ import ModulePage from "../../module/pages/ModulePage.tsx";
 import RolePage from "../../roles/pages/RolePage.tsx";
 import DevicesPage from "../../devices/pages/DevicesPage.tsx";
 import UserGeneralPage from "../../users-generales/pages/UserGeneralPage.tsx";
+import FaqsPage from "../../faqs/pages/FaqsPage";
 
 export default function MainRouter() {
     return (
@@ -32,6 +33,7 @@ export default function MainRouter() {
                     <Route path={ROUTES.USER_ROLE} element={<RolePage />} />
                     <Route path={ROUTES.DEVICES} element={<DevicesPage />} />
                     <Route path={ROUTES.USERS_GENERAL_ADMIN} element={<UserGeneralPage />} />
+                    <Route path={ROUTES.FAQS} element={<FaqsPage />} />
                 </Route>
             </Route>
         </Routes>

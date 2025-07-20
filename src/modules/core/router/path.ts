@@ -9,4 +9,5 @@ export const ROUTES = {
         USER_ROLE: "/roles",
         DEVICES: "/devices",
         USERS_GENERAL_ADMIN: "/users-general-management",
+        FAQS: "/faqs",
 };

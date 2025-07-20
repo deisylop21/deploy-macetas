@@ -21,4 +21,10 @@ export const API_ENDPOINTS = {
     PROFILE_UPDATE: "https://artistic-victory-env2.up.railway.app/profile-management",
     PROFILE_CHANGE_PASSWORD: "https://artistic-victory-env2.up.railway.app/profile-management/change-password",
     PROFILE_PHOTO: "https://artistic-victory-env2.up.railway.app/profile-management/profile/photo",
+    //Hola
+    FAQS: "https://artistic-victory-env2.up.railway.app/faqs",
+    FAQS_BY_ID: (id: string) => `https://artistic-victory-env2.up.railway.app/faqs/${id}`,
+    FAQS_BY_PARENT: (parentId: string) => `https://artistic-victory-env2.up.railway.app/faqs?parentId=${parentId}`,
+    FAQS_IMAGES_UPLOAD: "https://artistic-victory-env2.up.railway.app/faqs/images",
+    FAQS_IMAGES_DELETE: "https://artistic-victory-env2.up.railway.app/faqs/delete/images",
 };

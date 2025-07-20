@@ -110,7 +110,7 @@ const Sidebar = ({ user }: SidebarProps) => {
                 { id: "user-reports", label: "Reportes de usuario", icon: <UserReportsIcon className="w-5 h-5" /> },
                 { id: "plant-reports", label: "Reportes de personal", icon: <PersonalReportsIcon className="w-5 h-5" /> },
                 { id: "resolved-reports", label: "Reportes atendidos", icon: <ReportsAttendedIcon className="w-5 h-5" /> },
-                { id: "faq-program", label: "Programación de FAQ", icon: <FaqIcon2 className="w-5 h-5" /> },
+                { id: "faq-program", label: "Programación de FAQ", icon: <FaqIcon2 className="w-5 h-5" />, route: "/faqs" }, //HOLA
             ],
         },
     ];

@@ -14,6 +14,7 @@ export function useDeviceSocket(deviceId: string | undefined, jwt: string | null
     const [socketError, setSocketError] = useState<string | null>(null);
     const [isConnecting, setIsConnecting] = useState(false);
     const socketRef = useRef<Socket | null>(null);
+    const isAuthenticatedRef = useRef<boolean>(false);
 
     useEffect(() => {
         if (!deviceId || !jwt) {
@@ -25,6 +26,7 @@ export function useDeviceSocket(deviceId: string | undefined, jwt: string | null
             setReading(null);
             setSocketError(null);
             setIsConnecting(false);
+            isAuthenticatedRef.current = false;
             return;
         }
 
@@ -37,6 +39,7 @@ export function useDeviceSocket(deviceId: string | undefined, jwt: string | null
             setIsConnecting(true);
             setSocketError(null);
             setReading(null);
+            isAuthenticatedRef.current = false;
 
             if (socketRef.current) {
                 socketRef.current.removeAllListeners();
@@ -56,10 +59,22 @@ export function useDeviceSocket(deviceId: string | undefined, jwt: string | null
 
             socketRef.current = newSocket;
 
+            // Evento connect - NO suscribirse aún
             newSocket.on('connect', () => {
                 if (!isMounted) return;
+                console.log('Connected to server, waiting for authentication...');
+                // No cambiar isConnecting aquí, esperar connection_success
+            });
+
+            // Evento connection_success - AQUÍ es cuando se debe suscribir
+            newSocket.on('connection_success', (data) => {
+                if (!isMounted) return;
+                console.log('Authentication successful:', data);
                 setIsConnecting(false);
                 setSocketError(null);
+                isAuthenticatedRef.current = true;
+
+                // Ahora sí, suscribirse al dispositivo
                 newSocket.emit('subscribe_device', { deviceId });
             });
 
@@ -68,18 +83,32 @@ export function useDeviceSocket(deviceId: string | undefined, jwt: string | null
                 setReading(data);
             });
 
-            newSocket.on('subscription_success', () => {});
+            newSocket.on('subscription_success', (data) => {
+                if (!isMounted) return;
+                console.log('Subscription successful:', data);
+            });
+
+            newSocket.on('unsubscription_success', (data) => {
+                if (!isMounted) return;
+                console.log('Unsubscription successful:', data);
+            });
 
             newSocket.on('error', (err: any) => {
                 if (!isMounted) return;
+                console.error('Socket error:', err);
                 const errorMessage = `Error del servidor: ${err?.message || JSON.stringify(err)}`;
                 setSocketError(errorMessage);
                 setReading(null);
+                setIsConnecting(false);
+                isAuthenticatedRef.current = false;
             });
 
             newSocket.on('connect_error', (err: any) => {
                 if (!isMounted) return;
+                console.error('Connection error:', err);
                 setIsConnecting(false);
+                isAuthenticatedRef.current = false;
+
                 if (err.message && (err.message.includes('Unauthorized') || err.message.includes('401') || err.message.includes('token') || err.message.includes('auth'))) {
                     setSocketError("Autenticación fallida. Token inválido, expirado o no proporcionado correctamente.");
                 } else {
@@ -89,7 +118,10 @@ export function useDeviceSocket(deviceId: string | undefined, jwt: string | null
 
             newSocket.on('disconnect', (reason) => {
                 if (!isMounted) return;
+                console.log('Disconnected:', reason);
                 setIsConnecting(false);
+                isAuthenticatedRef.current = false;
+
                 if (reason !== 'io client disconnect' && reason !== 'io server disconnect') {
                     setSocketError(`Desconectado: ${reason}`);
                 }
@@ -101,13 +133,15 @@ export function useDeviceSocket(deviceId: string | undefined, jwt: string | null
         return () => {
             isMounted = false;
             if (socketRef.current) {
-                if (deviceId) {
+                // Solo desuscribirse si estaba autenticado y suscrito
+                if (deviceId && isAuthenticatedRef.current) {
                     socketRef.current.emit('unsubscribe_device', { deviceId });
                 }
                 socketRef.current.removeAllListeners();
                 socketRef.current.disconnect();
                 socketRef.current = null;
             }
+            isAuthenticatedRef.current = false;
         };
     }, [deviceId, jwt]);
 

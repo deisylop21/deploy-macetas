@@ -24,7 +24,6 @@ export const FaqItem: React.FC<FaqItemProps> = ({
     const [children, setChildren] = useState<Faq[]>([]);
     const [loadingChildren, setLoadingChildren] = useState(false);
 
-    // Estado para el modal de eliminación
     const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     const handleToggle = async () => {
@@ -32,7 +31,6 @@ export const FaqItem: React.FC<FaqItemProps> = ({
 
         setExpanded(!expanded);
 
-        // Solo cargar hijos si no están ya cargados
         if (!expanded && children.length === 0) {
             setLoadingChildren(true);
             try {
@@ -62,7 +60,6 @@ export const FaqItem: React.FC<FaqItemProps> = ({
     const marginLeft = level * 20;
     const isDark = mode === 'dark';
 
-    // Estilos según el nivel
     const getBackgroundColor = () => {
         if (level === 0) return isDark ? 'bg-gray-800' : 'bg-green-50';
         if (level === 1) return isDark ? 'bg-gray-700' : 'bg-green-25';
@@ -78,15 +75,12 @@ export const FaqItem: React.FC<FaqItemProps> = ({
     return (
         <>
             <div className="mb-2" style={{ marginLeft }}>
-                {/* FAQ Principal */}
                 <div className={`border-l-4 ${getBorderColor()} rounded p-3 ${getBackgroundColor()}`}>
                     <div className="flex items-start gap-3">
-                        {/* Icono tipo */}
                         <span className="text-xl flex-shrink-0 mt-1">
               {faq.type === 'pregunta' ? '❓' : '✅'}
             </span>
 
-                        {/* Contenido */}
                         <div className="flex-1 min-w-0">
                             <div
                                 className={`text-sm font-medium cursor-pointer hover:opacity-80 ${isDark ? 'text-white' : 'text-gray-800'}`}
@@ -95,7 +89,6 @@ export const FaqItem: React.FC<FaqItemProps> = ({
                                 {faq.content.text}
                             </div>
 
-                            {/* Fecha */}
                             <div className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                                 {new Date(faq.createdAt).toLocaleDateString('es-ES', {
                                     year: 'numeric',
@@ -106,7 +99,6 @@ export const FaqItem: React.FC<FaqItemProps> = ({
                                 })}
                             </div>
 
-                            {/* Imágenes */}
                             {faq.content.image_url && faq.content.image_url.length > 0 && (
                                 <div className="flex flex-wrap gap-2 mt-2">
                                     {faq.content.image_url.map((url, idx) => (
@@ -123,7 +115,6 @@ export const FaqItem: React.FC<FaqItemProps> = ({
                             )}
                         </div>
 
-                        {/* Botones de acción */}
                         <div className="flex flex-col gap-1 flex-shrink-0">
                             <button
                                 onClick={() => onEdit(faq)}
@@ -149,7 +140,6 @@ export const FaqItem: React.FC<FaqItemProps> = ({
                                 🗑️
                             </button>
 
-                            {/* Botón expandir/contraer */}
                             {faq.withchildren && (
                                 <button
                                     onClick={handleToggle}
@@ -163,7 +153,6 @@ export const FaqItem: React.FC<FaqItemProps> = ({
                     </div>
                 </div>
 
-                {/* Hijos expandidos */}
                 {expanded && (
                     <div className="mt-2">
                         {loadingChildren ? (
@@ -197,7 +186,6 @@ export const FaqItem: React.FC<FaqItemProps> = ({
                 )}
             </div>
 
-            {/* Modal de confirmación para eliminar FAQ */}
             <ConfirmModal
                 isOpen={showDeleteModal}
                 title={`¿Eliminar ${faq.type}?`}

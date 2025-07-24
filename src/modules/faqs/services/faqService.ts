@@ -118,12 +118,12 @@ export async function deleteFaq(id: string): Promise<void> {
     console.log('FAQ deleted:', id);
 }
 
-// Subir imagen
+
 export async function uploadImage(file: File): Promise<string[]> {
     console.log('Uploading image:', file.name, file.type, file.size);
 
     const formData = new FormData();
-    formData.append('files', file);//aquí
+    formData.append('files', file);
 
     const response = await fetch(API_ENDPOINTS.FAQS_IMAGES_UPLOAD, {
         method: 'POST',
@@ -142,7 +142,7 @@ export async function uploadImage(file: File): Promise<string[]> {
     return data.urls;
 }
 
-// Eliminar imagen
+
 export async function deleteImage(url: string): Promise<void> {
     console.log('Deleting image:', url);
 
@@ -162,5 +162,3 @@ export async function deleteImage(url: string): Promise<void> {
 
     console.log('Image deleted:', url);
 }
-
-{/*Hola hasta aqui el control z*/}

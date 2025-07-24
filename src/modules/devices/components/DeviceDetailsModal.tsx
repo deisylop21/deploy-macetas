@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Device } from "../lib/types";
 import { Button } from "../../core/components/ui/button";
 import { useAuthStore } from "../../core/states/authStore";
-import { io, Socket } from "socket.io-client";
+import { useDeviceSocket } from "../hooks/useDeviceSocket";
 
 function formatDate(dateStr?: string | null) {
     if (!dateStr) return "-";
@@ -13,6 +12,9 @@ function formatDate(dateStr?: string | null) {
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
     });
 }
 
@@ -25,14 +27,6 @@ interface DeviceDetailsModalProps {
     isDark?: boolean;
 }
 
-interface DeviceReading {
-    deviceId: string;
-    temperature?: number;
-    humidity?: number;
-    light_on?: boolean;
-    watering_on?: boolean;
-}
-
 export function DeviceDetailsModal({
                                        open,
                                        device,
@@ -42,57 +36,21 @@ export function DeviceDetailsModal({
                                        isDark = false,
                                    }: DeviceDetailsModalProps) {
     const token = useAuthStore(state => state.token);
-    const [socket, setSocket] = useState<Socket | null>(null);
-    const [reading, setReading] = useState<DeviceReading | null>(null);
-    const [socketError, setSocketError] = useState<string | null>(null);
 
-    useEffect(() => {
-        if (!open || !device?.id || !token) return;
-
-        if (socket) {
-            socket.disconnect();
-            setSocket(null);
-        }
-
-        const s = io("wss://artistic-victory-env2.up.railway.app/device-readings", {
-            transports: ["websocket"],
-            auth: { token }
-        });
-
-        setSocket(s);
-
-        s.emit("subscribe_device", { deviceId: device.id });
-
-        s.on("device_data", (data: DeviceReading) => {
-            setReading(data);
-            setSocketError(null);
-        });
-
-        s.on("error", (err: any) => {
-            setSocketError("Error en WebSocket: " + (err?.message || JSON.stringify(err)));
-            setReading(null);
-        });
-
-        s.on("connect_error", (err: any) => {
-            setSocketError("No se pudo conectar al WebSocket.");
-            setReading(null);
-        });
-
-        s.onAny((event, ...args) => {
-            console.log("Socket event:", event, args);
-        });
-
-        return () => {
-            s.emit("unsubscribe_device", { deviceId: device.id });
-            s.disconnect();
-            setSocket(null);
-            setReading(null);
-            setSocketError(null);
-        };
-        // eslint-disable-next-line
-    }, [open, device?.id, token]);
+    const { reading, socketError, isConnecting, isConnected } = useDeviceSocket(
+        open && (device?.status === "AVAILABLE" || device?.status === "LINKED") ? device?.id : undefined,
+        open ? token : null
+    );
 
     if (!open || !device) return null;
+
+    // Determinar el estado de conexión para mostrar
+    const connectionStatus = () => {
+        if (isConnecting) return "Conectando...";
+        if (socketError) return "Error de conexión";
+        if (!isConnected) return "No conectado";
+        return "Conectado";
+    };
 
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/40">
@@ -105,35 +63,68 @@ export function DeviceDetailsModal({
                     <div><strong>Fecha de registro:</strong> {formatDate(device.registered_at)}</div>
                     <div><strong>Fecha de enlace:</strong> {formatDate(device.linked_at)}</div>
                 </div>
-                <div className={`mb-4 p-3 rounded-lg border ${isDark ? 'bg-blue-900 border-blue-600' : 'bg-blue-50 border-blue-200'}`}>
-                    <div className="font-semibold mb-2 text-blue-600">Lectura en tiempo real:</div>
-                    <div>
-                        {socketError ? (
-                            <span className="text-red-500">{socketError}</span>
-                        ) : reading ? (
-                            <>
-                                <div><strong>Temperatura:</strong> {reading.temperature ?? "-"}°C</div>
-                                <div><strong>Humedad:</strong> {reading.humidity ?? "-"}%</div>
-                                <div><strong>Luz encendida:</strong> {reading.light_on !== undefined ? (reading.light_on ? "Sí" : "No") : "-"}</div>
-                                <div><strong>Riego activado:</strong> {reading.watering_on !== undefined ? (reading.watering_on ? "Sí" : "No") : "-"}</div>
-                            </>
-                        ) : (
-                            "No hay datos en tiempo real"
-                        )}
+
+                {(device.status === "AVAILABLE" || device.status === "LINKED") && (
+                    <div className={`mb-4 p-3 rounded-lg border ${isDark ? 'bg-blue-900 border-blue-600' : 'bg-blue-50 border-blue-200'}`}>
+                        <div className="flex justify-between items-center mb-2">
+                            <div className="font-semibold text-blue-600">Lectura en tiempo real</div>
+                            <div className={`text-xs px-2 py-1 rounded-full ${
+                                isConnected ? 'bg-green-100 text-green-800' :
+                                    isConnecting ? 'bg-yellow-100 text-yellow-800' :
+                                        'bg-red-100 text-red-800'
+                            }`}>
+                                {connectionStatus()}
+                            </div>
+                        </div>
+
+                        <div>
+                            {isConnecting ? (
+                                <span className={isDark ? "text-blue-300" : "text-blue-700"}>Conectando a WebSocket...</span>
+                            ) : socketError ? (
+                                <div className="space-y-1">
+                                    <span className="text-red-500">{socketError}</span>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => window.location.reload()}
+                                        className="mt-2"
+                                    >
+                                        Reintentar conexión
+                                    </Button>
+                                </div>
+                            ) : reading ? (
+                                <>
+                                    <div><strong>Temperatura:</strong> {reading.temperature ?? "-"}°C</div>
+                                    <div><strong>Humedad:</strong> {reading.humidity ?? "-"}%</div>
+                                    <div><strong>Luz encendida:</strong> {reading.light_on !== undefined ? (reading.light_on ? "Sí" : "No") : "-"}</div>
+                                    <div><strong>Riego activado:</strong> {reading.watering_on !== undefined ? (reading.watering_on ? "Sí" : "No") : "-"}</div>
+                                    <div><strong>Fecha de lectura:</strong> {formatDate(reading.created_at)}</div>
+                                </>
+                            ) : (
+                                <div className="text-gray-500">
+                                    {isConnected ? "Esperando datos del dispositivo..." : "Conecte para ver datos en tiempo real"}
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
+                )}
+
                 <div className="flex gap-2 justify-end mt-6">
                     <Button
                         onClick={() => onEdit(device)}
                         variant="outline"
                         size="sm"
                         className={isDark ? "bg-gray-700 text-white border-gray-600 hover:bg-gray-600" : ""}
-                    >Editar</Button>
+                    >
+                        Editar
+                    </Button>
                     <Button
                         onClick={onClose}
                         variant="ghost"
                         size="sm"
-                    >Cerrar</Button>
+                    >
+                        Cerrar
+                    </Button>
                 </div>
             </div>
         </div>

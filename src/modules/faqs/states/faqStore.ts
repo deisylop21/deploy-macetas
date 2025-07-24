@@ -20,7 +20,7 @@ export const useFaqStore = create<FaqState>((set, get) => ({
 
     loadFaqs: async () => {
         const state = get();
-        if (state.loading) return; // Evitar múltiples cargas simultáneas
+        if (state.loading) return;
 
         set({ loading: true, error: null });
         try {

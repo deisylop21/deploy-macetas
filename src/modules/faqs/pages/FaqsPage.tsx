@@ -42,7 +42,7 @@ const FaqsPage: React.FC = () => {
         setDeleting(faq.id);
         try {
             await deleteFaq(faq.id);
-            await loadFaqs(); // Recargar lista
+            await loadFaqs();
         } catch (error) {
             console.error('Error deleting FAQ:', error);
             alert('Error al eliminar FAQ');
@@ -59,7 +59,7 @@ const FaqsPage: React.FC = () => {
             } else {
                 await createFaq(type, content, parentId);
             }
-            await loadFaqs(); // Recargar lista
+            await loadFaqs();
             handleCloseForm();
         } catch (error) {
             console.error('Error saving FAQ:', error);
@@ -111,7 +111,6 @@ const FaqsPage: React.FC = () => {
         <div className={mode === "dark" ? "dark bg-[#151E2A] min-h-screen" : "bg-white min-h-screen"}>
             <div className="p-6">
                 <div className={`max-w-5xl mx-auto rounded-lg shadow-lg ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
-                    {/* Header - SIN BOTÓN "Nuevo FAQ" */}
                     <div className={`flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
                         <div>
                             <h1 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
@@ -134,7 +133,6 @@ const FaqsPage: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Contenido principal */}
                     <div className="p-6">
                         {loading ? (
                             <div className="text-center py-12">
@@ -187,7 +185,6 @@ const FaqsPage: React.FC = () => {
                             </div>
                         )}
 
-                        {/* Indicador de eliminación */}
                         {deleting && (
                             <div className="fixed bottom-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg">
                                 <div className="flex items-center gap-2">
@@ -200,7 +197,6 @@ const FaqsPage: React.FC = () => {
                 </div>
             </div>
 
-            {/* Form Modal */}
             <FaqForm
                 isOpen={showForm}
                 onClose={handleCloseForm}
@@ -210,7 +206,6 @@ const FaqsPage: React.FC = () => {
                 defaultType={defaultType}
             />
 
-            {/* Loading overlay cuando se está guardando */}
             {saving && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div className="bg-white dark:bg-gray-800 rounded-lg p-6 flex items-center gap-3">

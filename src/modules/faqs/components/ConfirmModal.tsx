@@ -28,7 +28,6 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
 
     const isDark = mode === 'dark';
 
-    // Estilos según el tipo
     const getTypeConfig = () => {
         switch (type) {
             case 'danger':
@@ -68,15 +67,12 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
             <div className={`w-full max-w-md rounded-lg shadow-xl ${isDark ? 'bg-gray-800' : 'bg-white'} border-t-4 ${config.borderColor}`}>
 
-                {/* Header con icono y título */}
                 <div className="p-6 pb-4">
                     <div className="flex items-center gap-4">
-                        {/* Icono */}
                         <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center ${config.iconBg}`}>
                             <span className="text-2xl">{config.icon}</span>
                         </div>
 
-                        {/* Título */}
                         <div className="flex-1">
                             <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                                 {title}
@@ -85,16 +81,13 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
                     </div>
                 </div>
 
-                {/* Mensaje */}
                 <div className="px-6 pb-6">
                     <p className={`text-sm leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
                         {message}
                     </p>
                 </div>
 
-                {/* Botones */}
                 <div className={`flex gap-3 px-6 py-4 border-t ${isDark ? 'border-gray-700 bg-gray-750' : 'border-gray-200 bg-gray-50'} rounded-b-lg`}>
-                    {/* Botón Cancelar */}
                     <button
                         onClick={onCancel}
                         className={`flex-1 px-4 py-2 rounded font-medium transition-colors ${
@@ -106,7 +99,6 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
                         {cancelText}
                     </button>
 
-                    {/* Botón Confirmar */}
                     <button
                         onClick={onConfirm}
                         className={`flex-1 px-4 py-2 text-white rounded font-medium transition-colors ${config.confirmBg}`}

@@ -6,7 +6,7 @@ export function useFaqs() {
 
     useEffect(() => {
         loadFaqs();
-    }, []); // Solo cargar una vez al montar
+    }, []);
 
     return {
         faqs,
@@ -16,7 +16,6 @@ export function useFaqs() {
     };
 }
 
-// Hook para cargar FAQs hijos
 export function useFaqChildren(parentId?: string) {
     const { fetchFaqs } = require('../services/faqService');
     const [children, setChildren] = React.useState<any[]>([]);

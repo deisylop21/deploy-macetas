@@ -1,3 +1,21 @@
+export interface CatalogPlant {
+    id: string;
+    name: string;
+}
+
+export interface Device {
+    id: string;
+    linked_at?: string;
+}
+
+export interface Pot {
+    id: string;
+    name: string;
+    created_at?: string;
+    catalog_plant: CatalogPlant;
+    device?: Device;
+}
+
 export interface UserGeneral {
     id: string;
     name: string;
@@ -5,7 +23,7 @@ export interface UserGeneral {
     email: string;
     status_account: "Active" | "Inactive" | "Pending";
     created_at?: string;
-    pots?: any[];
+    pots?: Pot[];
 }
 
 export interface UserGeneralFilters {

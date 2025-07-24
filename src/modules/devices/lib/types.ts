@@ -58,3 +58,12 @@ export interface DeviceResponse {
         totalPages: number;
     };
 }
+
+export interface DeviceReading {
+    deviceId: string;
+    temperature?: number;
+    humidity?: number;
+    light_on?: boolean;
+    watering_on?: boolean;
+    created_at?: string;
+}

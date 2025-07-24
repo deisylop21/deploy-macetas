@@ -1,136 +1,115 @@
 // useDeviceSocket.ts
 import { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
-
-export interface DeviceReading {
-    deviceId: string;
-    temperature?: number;
-    humidity?: number;
-    light_on?: boolean;
-    watering_on?: boolean;
-    created_at?: string;
-}
+import { DeviceReading } from "../lib/types";
 
 interface UseDeviceSocketResult {
     reading: DeviceReading | null;
     socketError: string | null;
     isConnecting: boolean;
-    isConnected: boolean;
 }
 
 export function useDeviceSocket(deviceId: string | undefined, jwt: string | null): UseDeviceSocketResult {
     const [reading, setReading] = useState<DeviceReading | null>(null);
     const [socketError, setSocketError] = useState<string | null>(null);
     const [isConnecting, setIsConnecting] = useState(false);
-    const [isConnected, setIsConnected] = useState(false);
     const socketRef = useRef<Socket | null>(null);
-    const retriesRef = useRef(0);
 
     useEffect(() => {
         if (!deviceId || !jwt) {
-            // Limpiar estado si no hay deviceId o jwt
+            if (socketRef.current) {
+                socketRef.current.removeAllListeners();
+                socketRef.current.disconnect();
+                socketRef.current = null;
+            }
             setReading(null);
             setSocketError(null);
             setIsConnecting(false);
-            setIsConnected(false);
             return;
         }
 
         let isMounted = true;
-        let reconnectTimeout: NodeJS.Timeout | null = null;
+        const socketUrl = "wss://artistic-victory-env2.up.railway.app/device-readings";
 
-        const connectAndSubscribe = () => {
+        const connectSocket = () => {
+            if (!isMounted) return;
+
             setIsConnecting(true);
             setSocketError(null);
             setReading(null);
 
-            // Limpiar conexión anterior si existe
             if (socketRef.current) {
+                socketRef.current.removeAllListeners();
                 socketRef.current.disconnect();
-                socketRef.current = null;
             }
 
-            const socketOptions = {
-                transports: ["websocket"],
-                auth: { token: jwt },
-                query: { token: jwt }, // Enviar también como query parameter
+            console.log(jwt);
+            const newSocket = io(socketUrl, {
+                auth: {
+                    token: jwt
+                },
+                transports: ['websocket'],
                 reconnection: false,
-            };
-
-            const socket = io("wss://artistic-victory-env2.up.railway.app/device-readings", socketOptions);
-            socketRef.current = socket;
-
-            socket.on("connect", () => {
-                if (!isMounted) return;
-                console.log("WebSocket connected, subscribing to device:", deviceId);
-                setIsConnecting(false);
-                setIsConnected(true);
-                setSocketError(null);
-                retriesRef.current = 0;
-
-                // Suscribirse al dispositivo
-                socket.emit("subscribe_device", { deviceId });
+                timeout: 20000,
+                reconnectionAttempts: 3,
             });
 
-            socket.on("device_data", (data: DeviceReading) => {
+            socketRef.current = newSocket;
+
+            newSocket.on('connect', () => {
+                if (!isMounted) return;
+                setIsConnecting(false);
+                setSocketError(null);
+                newSocket.emit('subscribe_device', { deviceId });
+            });
+
+            newSocket.on('device_data', (data: DeviceReading) => {
                 if (!isMounted) return;
                 setReading(data);
             });
 
-            socket.on("subscription_success", (data: any) => {
+            newSocket.on('subscription_success', () => {});
+
+            newSocket.on('error', (err: any) => {
                 if (!isMounted) return;
-                console.log("Subscription success:", data);
+                const errorMessage = `Error del servidor: ${err?.message || JSON.stringify(err)}`;
+                setSocketError(errorMessage);
+                setReading(null);
             });
 
-            socket.on("error", (err: any) => {
+            newSocket.on('connect_error', (err: any) => {
                 if (!isMounted) return;
-                console.error("WebSocket error:", err);
-                setSocketError(`Error: ${err?.message || "Error desconocido"}`);
-                setIsConnected(false);
-            });
-
-            socket.on("connect_error", (err: any) => {
-                if (!isMounted) return;
-                console.error("WebSocket connection error:", err);
-                setSocketError(`Error de conexión: ${err?.message || "No se pudo conectar"}`);
                 setIsConnecting(false);
-                setIsConnected(false);
-
-                // Reintentar con backoff exponencial (hasta 3 veces)
-                if (retriesRef.current < 3) {
-                    retriesRef.current += 1;
-                    const delay = Math.min(1500 * retriesRef.current, 10000); // Máximo 10 segundos
-                    console.log(`Reintentando conexión en ${delay}ms (intento ${retriesRef.current})`);
-                    reconnectTimeout = setTimeout(connectAndSubscribe, delay);
+                if (err.message && (err.message.includes('Unauthorized') || err.message.includes('401') || err.message.includes('token') || err.message.includes('auth'))) {
+                    setSocketError("Autenticación fallida. Token inválido, expirado o no proporcionado correctamente.");
                 } else {
-                    setSocketError("No se pudo establecer la conexión después de varios intentos");
+                    setSocketError(`Error de conexión: ${err.message || 'Desconocido'}`);
                 }
             });
 
-            socket.on("disconnect", () => {
+            newSocket.on('disconnect', (reason) => {
                 if (!isMounted) return;
-                console.log("WebSocket disconnected");
-                setIsConnected(false);
                 setIsConnecting(false);
+                if (reason !== 'io client disconnect' && reason !== 'io server disconnect') {
+                    setSocketError(`Desconectado: ${reason}`);
+                }
             });
         };
 
-        connectAndSubscribe();
+        connectSocket();
 
         return () => {
             isMounted = false;
             if (socketRef.current) {
                 if (deviceId) {
-                    socketRef.current.emit("unsubscribe_device", { deviceId });
+                    socketRef.current.emit('unsubscribe_device', { deviceId });
                 }
+                socketRef.current.removeAllListeners();
                 socketRef.current.disconnect();
                 socketRef.current = null;
             }
-            if (reconnectTimeout) clearTimeout(reconnectTimeout);
-            setIsConnected(false);
-            setIsConnecting(false);
         };
     }, [deviceId, jwt]);
 
-    return { reading, socketError, isConnecting, isConnected };
+    return { reading, socketError, isConnecting };
 }

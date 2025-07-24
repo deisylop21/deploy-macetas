@@ -37,10 +37,13 @@ export function DeviceDetailsModal({
                                    }: DeviceDetailsModalProps) {
     const token = useAuthStore(state => state.token);
 
-    const { reading, socketError, isConnecting, isConnected } = useDeviceSocket(
-        open && (device?.status === "AVAILABLE" || device?.status === "LINKED") ? device?.id : undefined,
-        open ? token : null
+    const { reading, socketError, isConnecting } = useDeviceSocket(
+        open && device && (device.status === "AVAILABLE" || device.status === "LINKED") ? device.id : undefined,
+        open && token ? token : null
     );
+
+    // Determinar si estamos conectados (tenemos lectura o no hay error aún)
+    const isConnected = !isConnecting && !socketError && (reading !== null);
 
     if (!open || !device) return null;
 
@@ -86,7 +89,7 @@ export function DeviceDetailsModal({
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => window.location.reload()}
+                                        onClick={() => window.location.reload()} // O puedes forzar un re-render del componente
                                         className="mt-2"
                                     >
                                         Reintentar conexión
